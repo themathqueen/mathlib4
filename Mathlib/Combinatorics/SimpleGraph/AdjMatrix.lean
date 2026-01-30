@@ -10,7 +10,6 @@ public import Mathlib.LinearAlgebra.Matrix.Symmetric
 public import Mathlib.LinearAlgebra.Matrix.Trace
 public import Mathlib.LinearAlgebra.Matrix.Hadamard
 
-import Mathlib.Algebra.GroupWithZero.Idempotent
 import Mathlib.Combinatorics.SimpleGraph.DegreeSum
 
 /-!
@@ -293,6 +292,12 @@ open Matrix
 
 @[simp] theorem ofNat_hadamard_adjMatrix [NatCast α] (a : ℕ) [a.AtLeastTwo] :
     ofNat(a) ⊙ G.adjMatrix α = 0 := diagonal_hadamard_adjMatrix _ _ _
+
+@[simp] theorem adjMatrix_hadamard_intCast [IntCast α] (a : ℤ) :
+    G.adjMatrix α ⊙ a.cast = 0 := adjMatrix_hadamard_diagonal _ _ _
+
+@[simp] theorem intCast_hadamard_adjMatrix [IntCast α] (a : ℤ) :
+    a.cast ⊙ G.adjMatrix α = 0 := diagonal_hadamard_adjMatrix _ _ _
 
 @[simp] theorem adjMatrix_hadamard_one :
     G.adjMatrix α ⊙ 1 = 0 := adjMatrix_hadamard_diagonal _ _ _
