@@ -176,15 +176,18 @@ theorem toGraph_adjMatrix_eq [MulZeroOneClass α] [Nontrivial α] :
 
 variable {α}
 
+theorem adjMatrix_add_compl_adjMatrix_eq_adjMatrix_completeGraph
+    [DecidableEq V] [DecidableEq α] [AddZeroClass α] [One α] :
+    G.adjMatrix α + (G.adjMatrix α).compl = (completeGraph V).adjMatrix α := by
+  aesop (add simp Matrix.compl)
+
 /-- The sum of the identity, the adjacency matrix, and its complement is the all-ones matrix. -/
-theorem one_add_adjMatrix_add_compl_adjMatrix_eq_allOnes [DecidableEq V] [DecidableEq α]
-    [AddMonoidWithOne α] : 1 + G.adjMatrix α + (G.adjMatrix α).compl = Matrix.of fun _ _ ↦ 1 := by
-  ext i j
-  unfold Matrix.compl
-  rw [of_apply, add_apply, adjMatrix_apply, add_apply, adjMatrix_apply, one_apply]
-  by_cases h : G.Adj i j
-  · aesop
-  · split_ifs <;> simp_all
+theorem one_add_adjMatrix_add_compl_adjMatrix_eq_of_one [DecidableEq V] [DecidableEq α]
+    [AddMonoid α] [One α] : 1 + G.adjMatrix α + (G.adjMatrix α).compl = of 1 := by
+  aesop (add simp [add_assoc, adjMatrix_add_compl_adjMatrix_eq_adjMatrix_completeGraph])
+
+@[deprecated (since := "2026-01-30")] alias one_add_adjMatrix_add_compl_adjMatrix_eq_allOnes :=
+  one_add_adjMatrix_add_compl_adjMatrix_eq_of_one
 
 variable [Fintype V]
 
@@ -269,7 +272,7 @@ theorem dotProduct_mulVec_adjMatrix [NonAssocSemiring α] (x y : V → α) :
   simp only [dotProduct, mulVec, adjMatrix_apply, ite_mul, one_mul, zero_mul, mul_sum, mul_ite,
     mul_zero]
 
-section
+section hadamard
 variable (α : Type*) [MulZeroOneClass α]
   {V : Type*} [DecidableEq V] (G : SimpleGraph V) [DecidableRel G.Adj]
 
@@ -305,7 +308,7 @@ open Matrix
 @[simp] theorem one_hadamard_adjMatrix :
     1 ⊙ G.adjMatrix α = 0 := diagonal_hadamard_adjMatrix _ _ _
 
-end
+end hadamard
 
 theorem adjMatrix_completeGraph_eq_of_one_sub_one (α V) [AddGroup α] [One α] [DecidableEq V] :
     (completeGraph V).adjMatrix α = of 1 - 1 := by
