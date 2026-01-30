@@ -229,7 +229,7 @@ theorem adjMatrix_mul_self_apply_self [NonAssocSemiring α] (i : V) :
     (G.adjMatrix α * G.adjMatrix α) i i = degree G i := by simp [filter_true_of_mem]
 
 variable (R) in
-/-- The number of all edges in a simple finite graph is equal to the dot product of
+/-- The number of all darts in a simple finite graph is equal to the dot product of
 `G.adjMatrix α *ᵥ 1` and `1`. -/
 theorem natCast_card_dart_eq_dotProduct [NonAssocSemiring α] :
     (Fintype.card G.Dart : α) = adjMatrix α G *ᵥ 1 ⬝ᵥ 1 := by
