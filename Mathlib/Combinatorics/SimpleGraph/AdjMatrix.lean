@@ -307,7 +307,7 @@ open Matrix
 
 end
 
-theorem completeGraph_eq_of_one_sub_one (α V) [AddGroup α] [One α] [DecidableEq V] :
+theorem adjMatrix_completeGraph_eq_of_one_sub_one (α V) [AddGroup α] [One α] [DecidableEq V] :
     (completeGraph V).adjMatrix α = of 1 - 1 := by
   ext; simp [one_apply, sub_ite]
 
