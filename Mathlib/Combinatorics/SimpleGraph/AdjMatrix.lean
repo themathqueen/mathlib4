@@ -174,8 +174,6 @@ theorem toGraph_adjMatrix_eq [MulZeroOneClass α] [Nontrivial α] :
   simp only [IsAdjMatrix.toGraph_adj, adjMatrix_apply, ite_eq_left_iff, zero_ne_one]
   apply Classical.not_not
 
-variable {α}
-
 theorem adjMatrix_add_compl_adjMatrix_eq_adjMatrix_completeGraph
     [DecidableEq V] [DecidableEq α] [AddZeroClass α] [One α] :
     G.adjMatrix α + (G.adjMatrix α).compl = (completeGraph V).adjMatrix α := by
@@ -192,9 +190,15 @@ theorem one_add_adjMatrix_add_compl_adjMatrix_eq_of_one [DecidableEq V] [Decidab
 @[simp] theorem compl_adjMatrix_completeGraph [Zero α] [One α] [DecidableEq α] [DecidableEq V] :
     ((completeGraph V).adjMatrix α).compl = 0 := by aesop (add simp Matrix.compl)
 
-@[simp] theorem compl_zero [Zero α] [One α] [DecidableEq α] [DecidableEq V] :
+@[simp] theorem compl_zero (V) [Zero α] [One α] [DecidableEq α] [DecidableEq V] :
     (0 : Matrix V V α).compl = (completeGraph V).adjMatrix α := by
   aesop (add simp Matrix.compl)
+
+theorem adjMatrix_completeGraph_eq_of_one_sub_one (V) [AddGroup α] [One α] [DecidableEq V] :
+    (completeGraph V).adjMatrix α = of 1 - 1 := by
+  ext; simp [one_apply, sub_ite]
+
+variable {α}
 
 section fintype
 variable [Fintype V]
@@ -318,10 +322,6 @@ open Matrix
     1 ⊙ G.adjMatrix α = 0 := diagonal_hadamard_adjMatrix _ _ _
 
 end hadamard
-
-theorem adjMatrix_completeGraph_eq_of_one_sub_one (α V) [AddGroup α] [One α] [DecidableEq V] :
-    (completeGraph V).adjMatrix α = of 1 - 1 := by
-  ext; simp [one_apply, sub_ite]
 
 end SimpleGraph
 
