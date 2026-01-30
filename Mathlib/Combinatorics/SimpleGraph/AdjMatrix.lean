@@ -232,7 +232,7 @@ variable (R) in
 /-- The number of all edges in a simple finite graph is equal to the dot product of
 `G.adjMatrix α *ᵥ 1` and `1`. -/
 theorem natCast_card_dart_eq_dotProduct [NonAssocSemiring α] :
-    Fintype.card G.Dart = adjMatrix α G *ᵥ 1 ⬝ᵥ 1 := by
+    (Fintype.card G.Dart : α) = adjMatrix α G *ᵥ 1 ⬝ᵥ 1 := by
   simp [G.dart_card_eq_sum_degrees, dotProduct_one]
 
 variable {G}
