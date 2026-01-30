@@ -189,6 +189,7 @@ theorem one_add_adjMatrix_add_compl_adjMatrix_eq_of_one [DecidableEq V] [Decidab
 @[deprecated (since := "2026-01-30")] alias one_add_adjMatrix_add_compl_adjMatrix_eq_allOnes :=
   one_add_adjMatrix_add_compl_adjMatrix_eq_of_one
 
+section fintype
 variable [Fintype V]
 
 @[simp]
@@ -272,9 +273,10 @@ theorem dotProduct_mulVec_adjMatrix [NonAssocSemiring α] (x y : V → α) :
   simp only [dotProduct, mulVec, adjMatrix_apply, ite_mul, one_mul, zero_mul, mul_sum, mul_ite,
     mul_zero]
 
+end fintype
+
 section hadamard
-variable (α : Type*) [MulZeroOneClass α]
-  {V : Type*} [DecidableEq V] (G : SimpleGraph V) [DecidableRel G.Adj]
+variable (α) [DecidableEq V] [MulZeroOneClass α]
 
 open Matrix
 
