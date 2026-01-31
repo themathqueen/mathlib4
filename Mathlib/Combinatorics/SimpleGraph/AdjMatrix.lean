@@ -103,7 +103,7 @@ theorem isAdjMatrix_iff_hadamard [DecidableEq V] [MonoidWithZero α]
 /-- For `A : Matrix V V α`, `A.compl` is supposed to be the adjacency matrix of
 the complement graph of the graph induced by `A.adjMatrix`. -/
 def compl [Zero α] [One α] [DecidableEq α] [DecidableEq V] (A : Matrix V V α) : Matrix V V α :=
-  fun i j => ite (i = j) 0 (ite (A i j = 0) 1 0)
+  of fun i j ↦ if i = j then 0 else if A i j = 0 then 1 else 0
 
 section Compl
 
@@ -114,8 +114,7 @@ theorem compl_apply_diag [Zero α] [One α] (i : V) : A.compl i i = 0 := by simp
 
 @[simp]
 theorem compl_apply [Zero α] [One α] (i j : V) : A.compl i j = 0 ∨ A.compl i j = 1 := by
-  unfold compl
-  split_ifs <;> simp
+  grind [compl, of]
 
 @[simp]
 theorem isSymm_compl [Zero α] [One α] (h : A.IsSymm) : A.compl.IsSymm := by
@@ -128,10 +127,10 @@ theorem isAdjMatrix_compl [Zero α] [One α] (h : A.IsSymm) : IsAdjMatrix A.comp
 
 theorem IsAdjMatrix.compl_inj [Zero α] [One α] {A B : Matrix V V α}
     (hA : A.IsAdjMatrix) (hB : B.IsAdjMatrix) : A.compl = B.compl ↔ A = B :=
-  ⟨fun h ↦ ext fun i j ↦ by grind [congr($h i j), compl, IsAdjMatrix], fun h ↦ h ▸ rfl⟩
+  ⟨fun h ↦ ext fun i j ↦ by grind [of, congr($h i j), compl, IsAdjMatrix], fun h ↦ h ▸ rfl⟩
 
 @[simp] theorem IsAdjMatrix.compl_compl [Zero α] [One α] {A : Matrix V V α} (hA : A.IsAdjMatrix) :
-    A.compl.compl = A := by ext; grind [compl, IsAdjMatrix]
+    A.compl.compl = A := by ext; grind [of, compl, IsAdjMatrix]
 
 namespace IsAdjMatrix
 
@@ -206,14 +205,22 @@ theorem one_add_adjMatrix_add_compl_adjMatrix_eq_of_one [DecidableEq V] [Decidab
 @[deprecated (since := "2026-01-30")] alias one_add_adjMatrix_add_compl_adjMatrix_eq_allOnes :=
   one_add_adjMatrix_add_compl_adjMatrix_eq_of_one
 
-@[simp] theorem compl_adjMatrix_completeGraph [Zero α] [One α] [DecidableEq α] [DecidableEq V] :
+@[simp] theorem compl_adjMatrix_completeGraph (V) [Zero α] [One α] [DecidableEq α] [DecidableEq V] :
     ((completeGraph V).adjMatrix α).compl = 0 := by aesop (add simp Matrix.compl)
 
-@[simp] theorem compl_zero (V) [Zero α] [One α] [DecidableEq α] [DecidableEq V] :
+@[simp] theorem _root_.Matrix.compl_zero (V) [Zero α] [One α] [DecidableEq α] [DecidableEq V] :
     (0 : Matrix V V α).compl = (completeGraph V).adjMatrix α := by simp [← IsAdjMatrix.compl_inj]
 
 theorem adjMatrix_completeGraph_eq_of_one_sub_one (V) [AddGroup α] [One α] [DecidableEq V] :
     (completeGraph V).adjMatrix α = of 1 - 1 := by ext; simp [one_apply, sub_ite]
+
+theorem _root_.Matrix.compl_zero_eq_of_one_sub_one (V) [AddGroup α] [One α] [DecidableEq V]
+    [DecidableEq α] : (0 : Matrix V V α).compl = of 1 - 1 := by
+  simp [adjMatrix_completeGraph_eq_of_one_sub_one]
+
+@[simp] theorem _root_.Matrix.compl_of_one_sub_one (V) [AddGroup α] [One α] [DecidableEq V]
+    [DecidableEq α] : (of 1 - 1 : Matrix V V α).compl = 0 := by
+  simp [← adjMatrix_completeGraph_eq_of_one_sub_one]
 
 variable {α}
 
