@@ -91,6 +91,9 @@ instance [MulZeroOneClass α] [Nontrivial α] [DecidableEq α] (h : IsAdjMatrix 
   simp only [toGraph]
   infer_instance
 
+@[simp] theorem hadamard_self [MulZeroOneClass α] {A : Matrix V V α} (hA : A.IsAdjMatrix) :
+    A ⊙ A = A := by ext i j; have := hA.zero_or_one i j; aesop
+
 end IsAdjMatrix
 
 theorem isAdjMatrix_iff_hadamard [DecidableEq V] [MonoidWithZero α]
@@ -232,6 +235,9 @@ theorem _root_.Matrix.compl_zero_eq_of_one_sub_one (V) [AddGroup α] [One α] [D
 @[simp] theorem _root_.Matrix.compl_of_one_sub_one (V) [AddGroup α] [One α] [DecidableEq V]
     [DecidableEq α] : (of 1 - 1 : Matrix V V α).compl = 0 := by
   simp [← adjMatrix_completeGraph_eq_of_one_sub_one]
+
+theorem adjMatrix_hadamard_self [MulZeroOneClass α] :
+    G.adjMatrix α ⊙ G.adjMatrix α = G.adjMatrix α := by simp
 
 variable {α}
 
