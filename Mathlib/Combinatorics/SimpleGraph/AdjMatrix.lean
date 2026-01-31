@@ -47,7 +47,7 @@ open Matrix
 
 open Finset SimpleGraph
 
-variable {V α : Type*}
+variable {α V : Type*}
 
 namespace Matrix
 
@@ -219,22 +219,26 @@ theorem one_add_adjMatrix_add_compl_adjMatrix_eq_of_one [DecidableEq V] [Decidab
 @[deprecated (since := "2026-01-30")] alias one_add_adjMatrix_add_compl_adjMatrix_eq_allOnes :=
   one_add_adjMatrix_add_compl_adjMatrix_eq_of_one
 
-@[simp] theorem compl_adjMatrix_completeGraph (V) [Zero α] [One α] [DecidableEq α] [DecidableEq V] :
+variable (V)
+
+@[simp] theorem compl_adjMatrix_completeGraph [Zero α] [One α] [DecidableEq α] [DecidableEq V] :
     ((completeGraph V).adjMatrix α).compl = 0 := by aesop (add simp Matrix.compl)
 
-@[simp] theorem _root_.Matrix.compl_zero (V) [Zero α] [One α] [DecidableEq α] [DecidableEq V] :
+@[simp] theorem _root_.Matrix.compl_zero [Zero α] [One α] [DecidableEq α] [DecidableEq V] :
     (0 : Matrix V V α).compl = (completeGraph V).adjMatrix α := by simp [← IsAdjMatrix.compl_inj]
 
-theorem adjMatrix_completeGraph_eq_of_one_sub_one (V) [AddGroup α] [One α] [DecidableEq V] :
+theorem adjMatrix_completeGraph_eq_of_one_sub_one [AddGroup α] [One α] [DecidableEq V] :
     (completeGraph V).adjMatrix α = of 1 - 1 := by ext; simp [one_apply, sub_ite]
 
-theorem _root_.Matrix.compl_zero_eq_of_one_sub_one (V) [AddGroup α] [One α] [DecidableEq V]
+theorem _root_.Matrix.compl_zero_eq_of_one_sub_one [AddGroup α] [One α] [DecidableEq V]
     [DecidableEq α] : (0 : Matrix V V α).compl = of 1 - 1 := by
   simp [adjMatrix_completeGraph_eq_of_one_sub_one]
 
-@[simp] theorem _root_.Matrix.compl_of_one_sub_one (V) [AddGroup α] [One α] [DecidableEq V]
+@[simp] theorem _root_.Matrix.compl_of_one_sub_one [AddGroup α] [One α] [DecidableEq V]
     [DecidableEq α] : (of 1 - 1 : Matrix V V α).compl = 0 := by
   simp [← adjMatrix_completeGraph_eq_of_one_sub_one]
+
+variable {V}
 
 theorem adjMatrix_hadamard_self [MulZeroOneClass α] :
     G.adjMatrix α ⊙ G.adjMatrix α = G.adjMatrix α := by simp
