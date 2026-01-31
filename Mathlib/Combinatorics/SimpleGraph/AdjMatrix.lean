@@ -216,8 +216,7 @@ theorem one_add_adjMatrix_add_compl_adjMatrix_eq_of_one [DecidableEq V] [Decidab
     ((completeGraph V).adjMatrix α).compl = 0 := by aesop (add simp Matrix.compl)
 
 @[simp] theorem compl_zero (V) [Zero α] [One α] [DecidableEq α] [DecidableEq V] :
-    (0 : Matrix V V α).compl = (completeGraph V).adjMatrix α := by
-  simp [← IsAdjMatrix.compl_inj, IsAdjMatrix.compl_compl]
+    (0 : Matrix V V α).compl = (completeGraph V).adjMatrix α := by simp [← IsAdjMatrix.compl_inj]
 
 theorem adjMatrix_completeGraph_eq_of_one_sub_one (V) [AddGroup α] [One α] [DecidableEq V] :
     (completeGraph V).adjMatrix α = of 1 - 1 := by
