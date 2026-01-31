@@ -192,15 +192,21 @@ theorem toGraph_adjMatrix_eq [MulZeroOneClass α] [Nontrivial α] :
   simp only [IsAdjMatrix.toGraph_adj, adjMatrix_apply, ite_eq_left_iff, zero_ne_one]
   apply Classical.not_not
 
-theorem adjMatrix_add_compl_adjMatrix_eq_adjMatrix_completeGraph
-    [DecidableEq V] [DecidableEq α] [AddZeroClass α] [One α] :
-    G.adjMatrix α + (G.adjMatrix α).compl = (completeGraph V).adjMatrix α := by
-  aesop (add simp Matrix.compl)
+theorem compl_adjMatrix_eq_adjMatrix_compl [DecidableEq V] [DecidableEq α] [Zero α] [One α] :
+    (G.adjMatrix α).compl = Gᶜ.adjMatrix α := by aesop (add simp [Matrix.compl])
+
+variable {G} in
+theorem IsCompl.adjMatrix_add_adjMatrix_eq_adjMatrix_completeGraph [DecidableEq V] [AddZeroClass α]
+    [One α] {H : SimpleGraph V} [DecidableRel H.Adj] (h : IsCompl G H) :
+    G.adjMatrix α + H.adjMatrix α = (completeGraph V).adjMatrix α := calc
+  _ = G.adjMatrix α + Gᶜ.adjMatrix α := by have := h.compl_eq; subst this; congr
+  _ = _ := by aesop (add simp Matrix.compl)
 
 /-- The sum of the identity, the adjacency matrix, and its complement is the all-ones matrix. -/
 theorem one_add_adjMatrix_add_compl_adjMatrix_eq_of_one [DecidableEq V] [DecidableEq α]
     [AddMonoid α] [One α] : 1 + G.adjMatrix α + (G.adjMatrix α).compl = of 1 := by
-  aesop (add simp [add_assoc, adjMatrix_add_compl_adjMatrix_eq_adjMatrix_completeGraph])
+  aesop (add simp [add_assoc, compl_adjMatrix_eq_adjMatrix_compl,
+    IsCompl.adjMatrix_add_adjMatrix_eq_adjMatrix_completeGraph, isCompl_compl])
 
 @[deprecated (since := "2026-01-30")] alias one_add_adjMatrix_add_compl_adjMatrix_eq_allOnes :=
   one_add_adjMatrix_add_compl_adjMatrix_eq_of_one
