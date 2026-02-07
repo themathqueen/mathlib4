@@ -52,14 +52,15 @@ variable
   [AddCommMonoid C] [Module R C] [CoalgebraStruct R C]
 
 /-- Convolution product on linear maps from a coalgebra to an algebra. -/
-instance convMul : Mul (ConvRing (C →ₗ[R] A)) where mul f g := ofRing (mul' R A ∘ₗ map f g ∘ₗ comul)
+instance convMul : Mul (ConvRing (C →ₗ[R] A)) where
+  mul f g := ofRing (mul' R A ∘ₗ map f.toRing g.toRing ∘ₗ comul)
 
 lemma convMul_def (f g : ConvRing (C →ₗ[R] A)) :
-    f * g = ofRing (mul' R A ∘ₗ map f g ∘ₗ comul) := rfl
+    f * g = ofRing (mul' R A ∘ₗ map f.toRing g.toRing ∘ₗ comul) := rfl
 
 @[simp]
 lemma convMul_apply (f g : ConvRing (C →ₗ[R] A)) (c : C) :
-    (f * g) c = ofRing (mul' R A (.map f.toRing g.toRing (comul c))) := rfl
+    (f * g) c = mul' R A (.map f.toRing g.toRing (comul c)) := rfl
 
 lemma _root_.Coalgebra.Repr.convMul_apply {a : C} (𝓡 : Coalgebra.Repr R a)
     (f g : ConvRing (C →ₗ[R] A)) : (f * g) a = ∑ i ∈ 𝓡.index, f (𝓡.left i) * g (𝓡.right i) := by
@@ -104,17 +105,17 @@ section NonUnitalSemiring
 variable [NonUnitalSemiring A] [Module R A] [SMulCommClass R A A] [IsScalarTower R A A]
   [AddCommMonoid C] [Module R C] [Coalgebra R C]
 
--- lemma nonUnitalAlgHom_comp_convMul_distrib
---     [NonUnitalNonAssocSemiring B] [Module R B] [SMulCommClass R B B] [IsScalarTower R B B]
---     (h : A →ₙₐ[R] B) (f g : ConvRing (C →ₗ[R] A)) :
---     (h : A →ₗ[R] B).comp (f * g).toRing =
---       ofRing (LinearMap.comp h f.toRing) * ofRing (LinearMap.comp h g.toRing) := by
---   simp [convMul_def, map_comp, ← comp_assoc, NonUnitalAlgHom.comp_mul']
+lemma nonUnitalAlgHom_comp_convMul_distrib
+    [NonUnitalNonAssocSemiring B] [Module R B] [SMulCommClass R B B] [IsScalarTower R B B]
+    (h : A →ₙₐ[R] B) (f g : ConvRing (C →ₗ[R] A)) :
+    (h : A →ₗ[R] B).comp (f * g).toRing =
+      (ofRing ((h : A →ₗ[R] B).comp f.toRing) * ofRing ((h : A →ₗ[R] B).comp g.toRing)).toRing := by
+  simp [convMul_def, map_comp, ← comp_assoc, NonUnitalAlgHom.comp_mul']
 
 lemma convMul_comp_coalgHom_distrib [AddCommMonoid B] [Module R B] [CoalgebraStruct R B]
     (f g : ConvRing (C →ₗ[R] A)) (h : B →ₗc[R] C) :
     (f * g).toRing.comp h.toLinearMap =
-      ofRing (f.toRing.comp h.toLinearMap) * ofRing (g.toRing.comp h.toLinearMap) := by
+      (ofRing (f.toRing.comp h.toLinearMap) * ofRing (g.toRing.comp h.toLinearMap)).toRing := by
   simp [convMul_def, map_comp, comp_assoc]
 
 /-- Non-unital convolution semiring structure on linear maps from a coalgebra to a
@@ -154,7 +155,7 @@ variable [CoalgebraStruct R C]
 
 lemma algHom_comp_convMul_distrib (h : A →ₐ B) (f g : ConvRing (C →ₗ[R] A)) :
     h.toLinearMap.comp (f * g).toRing =
-      ofRing (h.toLinearMap.comp f.toRing) * ofRing (h.toLinearMap.comp g.toRing) := by
+      (ofRing (h.toLinearMap.comp f.toRing) * ofRing (h.toLinearMap.comp g.toRing)).toRing := by
   simp [convMul_def, map_comp, ← comp_assoc, AlgHom.comp_mul']
 
 end CoalgebraStruct

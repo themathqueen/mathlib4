@@ -6,7 +6,6 @@ Authors: Monica Omar
 module
 
 public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
--- public import Mathlib.Algebra.Group.TransferInstance
 public import Mathlib.Algebra.Module.Equiv.Defs
 public import Mathlib.Algebra.Module.TransferInstance
 public import Mathlib.RingTheory.Finiteness.Basic
@@ -60,15 +59,17 @@ lemma ofRing_injective : Function.Injective (@ofRing A) :=
 lemma toRing_bijective : Function.Bijective (@toRing A) := ⟨toRing_injective, toRing_surjective⟩
 lemma ofRing_bijective : Function.Bijective (@ofRing A) := ⟨ofRing_injective, ofRing_surjective⟩
 
-instance : Coe (ConvRing A) A where coe := toRing
-instance {B C} [CoeFun A (fun _ ↦ B → C)] : CoeFun (ConvRing A) (fun _ ↦ B → C) where
-  coe f := ⇑(f : A)
+-- instance : Coe (ConvRing A) A where coe := toRing
+instance [Semiring R] {B : Type*} [AddCommMonoid A] [Module R A] [AddCommMonoid B] [Module R B] :
+    CoeFun (ConvRing (A →ₗ[R] B)) (fun _ ↦ A → B) where coe f := ⇑f.toRing
+-- instance {B C} [CoeFun A (fun _ ↦ B → C)] : CoeFun (ConvRing A) (fun _ ↦ B → C) where
+--   coe f := ⇑(f : A)
 
 @[ext] protected theorem ext {x y : ConvRing A}
     (h : x.toRing = y.toRing) : x = y := toRing_injective h
 
 variable (A) in
-/-- `WithLp.ofLp` and `WithLp.toLp` as an equivalence. -/
+/-- `ConvRing.toRing` and `ConvRing.ofRing` as an equivalence. -/
 protected def equiv : ConvRing A ≃ A where
   toFun := toRing
   invFun := ofRing
@@ -94,8 +95,8 @@ instance [Semiring R] [AddCommMonoid A] [Module R A] : Module R (ConvRing A) :=
 section AddCommGroup
 variable [AddCommGroup A]
 
-@[simp] lemma toRing_sub (x y : A) : ofRing (x - y) = ofRing x - ofRing y := rfl
-@[simp] lemma ofRing_sub (x y : ConvRing A) : toRing (x - y) = toRing x - toRing y := rfl
+@[simp] lemma ofRing_sub (x y : A) : ofRing (x - y) = ofRing x - ofRing y := rfl
+@[simp] lemma toRing_sub (x y : ConvRing A) : toRing (x - y) = toRing x - toRing y := rfl
 
 @[simp] lemma toRing_neg (x : ConvRing A) : toRing (-x) = -toRing x := rfl
 @[simp] lemma ofRing_neg (x : A) : ofRing (-x) = -ofRing x := rfl
@@ -117,6 +118,7 @@ variable [AddCommMonoid A]
 @[simp] lemma ofRing_eq_zero {x : A} : ofRing x = 0 ↔ x = 0 := ofRing_injective.eq_iff
 
 variable (A) in
+/-- The additive equivalence between `ConvRing A` and `A`. -/
 @[simps!] protected def addEquiv : ConvRing A ≃+ A where
   __ := ConvRing.equiv A
   map_add' := by simp

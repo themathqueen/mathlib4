@@ -66,15 +66,15 @@ theorem IntrinsicStar.isSelfAdjoint_iff_map_star (f : ConvRing (E →ₗ[R] F)) 
 @[deprecated (since := "2025-12-09")]
 alias isSelfAdjoint_iff_map_star := IntrinsicStar.isSelfAdjoint_iff_map_star
 
--- /-- A star-preserving linear map is self-adjoint (with respect to the intrinsic star). -/
--- @[simp]
--- protected theorem _root_.IntrinsicStar.StarHomClass.isSelfAdjoint {S : Type*} [FunLike S E F]
---     [LinearMapClass S R E F] [StarHomClass S E F] {f : S} :
---     IsSelfAdjoint (ofRing (f : E →ₗ[R] F) : ConvRing (E →ₗ[R] F)) :=
---   IntrinsicStar.isSelfAdjoint_iff_map_star _ |>.mpr (map_star f)
+/-- A star-preserving linear map is self-adjoint (with respect to the intrinsic star). -/
+@[simp]
+protected theorem _root_.IntrinsicStar.StarHomClass.isSelfAdjoint {S : Type*} [FunLike S E F]
+    [LinearMapClass S R E F] [StarHomClass S E F] {f : S} :
+    IsSelfAdjoint (ofRing (f : E →ₗ[R] F) : ConvRing (E →ₗ[R] F)) :=
+  IntrinsicStar.isSelfAdjoint_iff_map_star _ |>.mpr (map_star f)
 
--- @[deprecated (since := "2025-12-09")]
--- alias _root_.StarHomClass.isSelfAdjoint := _root_.IntrinsicStar.StarHomClass.isSelfAdjoint
+@[deprecated (since := "2025-12-09")]
+alias _root_.StarHomClass.isSelfAdjoint := _root_.IntrinsicStar.StarHomClass.isSelfAdjoint
 
 variable {G : Type*} [AddCommMonoid G] [Module R G] [StarAddMonoid G] [StarModule R G]
 
@@ -121,7 +121,7 @@ theorem _root_.TensorProduct.intrinsicStar_map
   ConvRing.ext <| TensorProduct.ext' fun _ _ ↦ by simp
 
 theorem intrinsicStar_lTensor (f : ConvRing (F →ₗ[R] G)) :
-    star (ofRing (lTensor E f)) = ofRing (lTensor E (star f).toRing) := by ext; simp
+    star (ofRing (lTensor E f.toRing)) = ofRing (lTensor E (star f).toRing) := by ext; simp
 
 theorem intrinsicStar_rTensor (f : ConvRing (E →ₗ[R] F)) :
     star (ofRing (rTensor G f.toRing)) = ofRing (rTensor G (star f).toRing) := by ext; simp
@@ -131,9 +131,11 @@ theorem intrinsicStar_eq_comp (f : ConvRing (E →ₗ[R] F)) :
       ofRing ((starLinearEquiv R).toLinearMap ∘ₛₗ f.toRing ∘ₛₗ (starLinearEquiv R).toLinearMap) :=
   rfl
 
--- theorem IntrinsicStar.starLinearEquiv_eq_arrowCongr :
---     starLinearEquiv R (A := ConvRing (E →ₗ[R] F)) =
---       (starLinearEquiv R).arrowCongr (starLinearEquiv R) := rfl
+theorem IntrinsicStar.starLinearEquiv_eq_arrowCongr :
+    starLinearEquiv R (A := ConvRing (E →ₗ[R] F)) =
+      (ConvRing.linearEquiv R _).trans
+      (((starLinearEquiv R).arrowCongr (starLinearEquiv R)).trans
+        (ConvRing.linearEquiv R _).symm) := rfl
 
 end CommSemiring
 
@@ -185,41 +187,45 @@ theorem IntrinsicStar.isSelfAdjoint_toLin'_iff (A : Matrix n m R) :
 end Matrix
 end matrix
 
--- namespace Module.End
+namespace Module.End
 
--- /-- Intrinsic star operation for `(End R E)ˣ`. -/
--- def Units.intrinsicStar : Star (End R E)ˣ where
---   star f := by
---     refine ⟨star f, star (f⁻¹ : (End R E)ˣ), ?_, ?_⟩
---     all_goals
---       rw [mul_eq_comp, ← LinearMap.intrinsicStar_comp]
---       simp [← mul_eq_comp, one_eq_id]
+/-- Intrinsic star operation for `(End R E)ˣ`. -/
+instance Units.intrinsicStar : Star (ConvRing (End R E)ˣ) where
+  star f := ofRing <| by
+    refine ⟨(star (ofRing ↑f.toRing : ConvRing (End R E))).toRing,
+      (star (ofRing ↑(f.toRing⁻¹ : (End R E)ˣ))).toRing, ?_, ?_⟩
+    all_goals
+      rw [← ofRing_injective.eq_iff, mul_eq_comp, ← comp_def, ← LinearMap.intrinsicStar_comp]
+      simp [comp_def, ← mul_eq_comp, one_eq_id]
 
--- scoped[IntrinsicStar] attribute [instance] Module.End.Units.intrinsicStar
+theorem IsUnit.intrinsicStar {f : ConvRing (End R E)} (hf : IsUnit f.toRing) :
+    IsUnit (star f).toRing := by
+  have ⟨u, hu⟩ := hf
+  have : IsUnit (star (ofRing (u : End R E))).toRing := (star (ofRing u)).toRing.isUnit
+  simpa [hu] using this
 
--- theorem IsUnit.intrinsicStar {f : End R E} (hf : IsUnit f) : IsUnit (star f) :=
---   have ⟨u, hu⟩ := hf
---   hu ▸ (star u).isUnit
+open Module.End in
+@[simp] theorem isUnit_intrinsicStar_iff {f : ConvRing (End R E)} :
+    IsUnit (star f).toRing ↔ IsUnit f.toRing :=
+  ⟨fun h ↦ star_star f ▸ h.intrinsicStar, fun h ↦ h.intrinsicStar⟩
 
--- open Module.End in
--- @[simp] theorem isUnit_intrinsicStar_iff {f : End R E} : IsUnit (star f) ↔ IsUnit f :=
---   ⟨fun h ↦ star_star f ▸ h.intrinsicStar, fun h ↦ h.intrinsicStar⟩
+section eigenspace
+variable {R V : Type*} [CommRing R] [InvolutiveStar R] [AddCommGroup V] [StarAddMonoid V]
+  [Module R V] [StarModule R V]
 
--- section eigenspace
--- variable {R V : Type*} [CommRing R] [InvolutiveStar R] [AddCommGroup V] [StarAddMonoid V]
---   [Module R V] [StarModule R V]
+open LinearMap
 
--- open LinearMap
+theorem mem_eigenspace_intrinsicStar_iff (f : ConvRing (End R V)) (α : R) (x : V) :
+    x ∈ (star f).toRing.eigenspace α ↔ star x ∈ f.toRing.eigenspace (star α) := by
+  simp_rw [mem_eigenspace_iff, intrinsicStar_apply, star_eq_iff_star_eq, star_smul, eq_comm]
 
--- theorem mem_eigenspace_intrinsicStar_iff (f : End R V) (α : R) (x : V) :
---     x ∈ (star f).eigenspace α ↔ star x ∈ f.eigenspace (star α) := by
---   simp_rw [mem_eigenspace_iff, intrinsicStar_apply, star_eq_iff_star_eq, star_smul, eq_comm]
+@[simp]
+theorem spectrum_intrinsicStar (f : ConvRing (End R V)) :
+    spectrum R (star f).toRing = star (spectrum R f.toRing) := by
+  ext x
+  simp_rw [Set.mem_star, spectrum.mem_iff, not_iff_not, Algebra.algebraMap_eq_smul_one]
+  rw [← isUnit_intrinsicStar_iff]
+  simp [one_eq_id]
 
--- @[simp]
--- theorem spectrum_intrinsicStar (f : End R V) : spectrum R (star f) = star (spectrum R f) := by
---   ext x
---   simp_rw [Set.mem_star, spectrum.mem_iff, not_iff_not, Algebra.algebraMap_eq_smul_one]
---   rw [← isUnit_intrinsicStar_iff, star_sub, star_star, star_smul, one_eq_id, intrinsicStar_id]
-
--- end eigenspace
--- end Module.End
+end eigenspace
+end Module.End
