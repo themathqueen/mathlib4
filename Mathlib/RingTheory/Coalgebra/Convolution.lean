@@ -121,19 +121,18 @@ lemma convMul_comp_coalgHom_distrib [AddCommMonoid B] [Module R B] [CoalgebraStr
 /-- Non-unital convolution semiring structure on linear maps from a coalgebra to a
 non-unital algebra. -/
 instance convNonUnitalSemiring : NonUnitalSemiring (ConvRing (C →ₗ[R] A)) where
-  mul_assoc f g h := calc
-    _ = ofRing ((μ ∘ₗ rTensor _ μ) ∘ₗ (((f.toRing ⊗ₘ g.toRing) ⊗ₘ h.toRing) ∘ₗ
-        (TensorProduct.assoc R C C C).symm) ∘ₗ lTensor C δ ∘ₗ δ) := by
+  mul_assoc f g h := ofRing_injective.eq_iff.mpr <| calc
+    _ = (μ ∘ₗ rTensor _ μ) ∘ₗ (((f.toRing ⊗ₘ g.toRing) ⊗ₘ h.toRing) ∘ₗ
+        (TensorProduct.assoc R C C C).symm) ∘ₗ lTensor C δ ∘ₗ δ := by
       ext; simp [comp_assoc, coassoc_symm, convMul_def]
-    _ = ofRing ((μ ∘ₗ rTensor A μ ∘ₗ ↑(TensorProduct.assoc R A A A).symm) ∘ₗ
-        (f.toRing ⊗ₘ (g.toRing ⊗ₘ h.toRing)) ∘ₗ lTensor C δ ∘ₗ δ) := by
+    _ = (μ ∘ₗ rTensor A μ ∘ₗ ↑(TensorProduct.assoc R A A A).symm) ∘ₗ
+        (f.toRing ⊗ₘ (g.toRing ⊗ₘ h.toRing)) ∘ₗ lTensor C δ ∘ₗ δ := by
       simp only [map_map_comp_assoc_symm_eq, comp_assoc]
-    _ = ofRing ((μ ∘ₗ .lTensor _ μ) ∘ₗ (f.toRing ⊗ₘ (g.toRing ⊗ₘ h.toRing)) ∘ₗ
-        (lTensor C δ ∘ₗ δ)) := by
-      congr 2
+    _ = (μ ∘ₗ .lTensor _ μ) ∘ₗ (f.toRing ⊗ₘ (g.toRing ⊗ₘ h.toRing)) ∘ₗ (lTensor C δ ∘ₗ δ) := by
+      congr 1
       ext
       simp [mul_assoc]
-    _ = ofRing (μ ∘ₗ (f.toRing ⊗ₘ μ ∘ₗ (g.toRing ⊗ₘ h.toRing) ∘ₗ δ) ∘ₗ δ) := by ext; simp
+    _ = μ ∘ₗ (f.toRing ⊗ₘ μ ∘ₗ (g.toRing ⊗ₘ h.toRing) ∘ₗ δ) ∘ₗ δ := by ext; simp
 
 end NonUnitalSemiring
 
