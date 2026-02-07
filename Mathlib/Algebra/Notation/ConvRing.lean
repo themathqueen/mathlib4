@@ -59,11 +59,8 @@ lemma ofRing_injective : Function.Injective (@ofRing A) :=
 lemma toRing_bijective : Function.Bijective (@toRing A) := ⟨toRing_injective, toRing_surjective⟩
 lemma ofRing_bijective : Function.Bijective (@ofRing A) := ⟨ofRing_injective, ofRing_surjective⟩
 
--- instance : Coe (ConvRing A) A where coe := toRing
-instance [Semiring R] {B : Type*} [AddCommMonoid A] [Module R A] [AddCommMonoid B] [Module R B] :
-    CoeFun (ConvRing (A →ₗ[R] B)) (fun _ ↦ A → B) where coe f := ⇑f.toRing
--- instance {B C} [CoeFun A (fun _ ↦ B → C)] : CoeFun (ConvRing A) (fun _ ↦ B → C) where
---   coe f := ⇑(f : A)
+instance {B C} [CoeFun A (fun _ ↦ B → C)] : CoeFun (ConvRing A) (fun _ ↦ B → C) where
+  coe f := ⇑f.toRing
 
 @[ext] protected theorem ext {x y : ConvRing A}
     (h : x.toRing = y.toRing) : x = y := toRing_injective h
