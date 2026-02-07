@@ -31,9 +31,9 @@ diagrammatically, where `μ` stands for multiplication and `δ` for comultiplica
 
 ## Implementation notes
 
-Note that in the case `C = A` this convolution product conflicts with the (unfortunately global!)
-group instance on `Module.End R A` with multiplication defined as composition.
-As a result, the convolution product is scoped to `ConvolutionProduct`.
+Because there is a global multiplication instance on `Module.Ebnd R A` (defined as composition),
+which is mathematically distinct from this product, we provide this instance on
+`ConvRing (C →ₗ[R] A)`.
 -/
 
 @[expose] public section

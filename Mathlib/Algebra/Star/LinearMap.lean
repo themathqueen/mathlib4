@@ -13,8 +13,7 @@ public import Mathlib.Algebra.Star.TensorProduct
 public import Mathlib.LinearAlgebra.Eigenspace.Basic
 public import Mathlib.LinearAlgebra.Matrix.ToLin
 
-/-!
-# Intrinsic star operation on `E →ₗ[R] F`
+/-! # Intrinsic star operation on linear maps
 
 This file defines the star operation on linear maps: `(star f) x = star (f (star x))`.
 This corresponds to a map being star-preserving, i.e., a map is self-adjoint iff it
@@ -22,11 +21,13 @@ is star-preserving.
 
 ## Implementation notes
 
-**Note** that in the case of when `E = F` for a finite-dimensional Hilbert space, this `star`
-is mathematically distinct from the global instance on `E →ₗ[𝕜] E` where
-`star := LinearMap.adjoint`.
-For that reason, the intrinsic star operation is scoped to `IntrinsicStar`.
--/
+Because there is a global `star` instance on `H →ₗ[𝕜] H` (defined as the linear amp adjoint on
+finite-dimensional Hilbert spaces), which is mathematically distinct from this `star`, we provide
+this instance on `ConvRing (E →ₗ[R] F)`.
+
+The reason we chose `ConvRing` is because together with the convolution product from
+`Mathlib/RingTheory/Coalgebra/Convolution.lean`, we get a ⋆-algebra when
+`star (ConvRing.ofRing comul) = ConvRing.ofRing (comm ∘ comul)`. -/
 
 @[expose] public section
 
