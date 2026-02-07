@@ -836,6 +836,7 @@ public import Mathlib.Algebra.NoZeroSMulDivisors.Prod
 public import Mathlib.Algebra.NonAssoc.LieAdmissible.Defs
 public import Mathlib.Algebra.NonAssoc.PreLie.Basic
 public import Mathlib.Algebra.Notation
+public import Mathlib.Algebra.Notation.ConvRing
 public import Mathlib.Algebra.Notation.Defs
 public import Mathlib.Algebra.Notation.FiniteSupport
 public import Mathlib.Algebra.Notation.Indicator
