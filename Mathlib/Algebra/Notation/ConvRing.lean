@@ -41,7 +41,7 @@ meta def ConvRing.delabOfRing : Delab := delabApp
 namespace ConvRing
 variable {R A : Type*}
 
-@[simp] lemma toRing_ofRing (x : A) : toRing (ofRing x) = x := rfl
+lemma toRing_ofRing (x : A) : toRing (ofRing x) = x := rfl
 @[simp] lemma ofRing_toRing (x : ConvRing A) : ofRing (toRing x) = x := rfl
 
 lemma toRing_surjective : Function.Surjective (@toRing A) :=
@@ -120,7 +120,7 @@ variable (A) in
   __ := ConvRing.equiv A
   map_add' := by simp
 
-@[simp] theorem toEquiv_addEquiv : (ConvRing.addEquiv A).toEquiv = ConvRing.equiv A := rfl
+@[simp] theorem toEquiv_addEquiv : (ConvRing.addEquiv A : ConvRing A ≃ A) = ConvRing.equiv A := rfl
 
 variable (R A) in
 /-- The linear equivalence between `ConvRing A` and `A`. -/

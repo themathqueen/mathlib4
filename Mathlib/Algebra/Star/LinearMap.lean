@@ -83,7 +83,7 @@ theorem intrinsicStar_comp (f : ConvRing (E →ₗ[R] F)) (g : ConvRing (G →�
 
 @[simp] theorem intrinsicStar_id :
     star (ofRing (LinearMap.id (R := R) (M := E))) = ofRing LinearMap.id := by ext; simp
-@[simp] theorem intrinsicStar_zero : star (0 : ConvRing (E →ₗ[R] F)) = 0 := by ext; simp
+theorem intrinsicStar_zero : star (0 : ConvRing (E →ₗ[R] F)) = 0 := by simp
 
 section NonUnitalNonAssocSemiring
 variable {R' E : Type*} [CommSemiring R'] [StarRing R']
