@@ -5,7 +5,11 @@ Authors: Monica Omar
 -/
 module
 
+public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+-- public import Mathlib.Algebra.Group.TransferInstance
 public import Mathlib.Algebra.Module.Equiv.Defs
+public import Mathlib.Algebra.Module.TransferInstance
+public import Mathlib.RingTheory.Finiteness.Basic
 
 /-! # Type synonym for linear map convolutive ring and intrinsic star
 
@@ -23,8 +27,7 @@ This is given for any type `A` so that we can have `ConvRing (A →ₗ[R] B)` as
 
 The instances for the convolutive product and intrinsic star are only available with this type.
 
-Use `toConvRing.linearEquiv` to coerce into this type. -/
--- def ConvRing (A : Type*) := A
+Use `ConvRing.linearEquiv` to coerce into this type. -/
 structure ConvRing A where
   /-- Converts an element of `A` to `ConvRing A`. -/
   ofRing ::
@@ -54,69 +57,117 @@ lemma toRing_injective : Function.Injective (@toRing A) :=
 lemma ofRing_injective : Function.Injective (@ofRing A) :=
   Function.LeftInverse.injective toRing_ofRing
 
-lemma toRing_bijective : Function.Bijective (@toRing A) :=
-  ⟨toRing_injective, toRing_surjective⟩
+lemma toRing_bijective : Function.Bijective (@toRing A) := ⟨toRing_injective, toRing_surjective⟩
+lemma ofRing_bijective : Function.Bijective (@ofRing A) := ⟨ofRing_injective, ofRing_surjective⟩
 
-lemma ofRing_bijective : Function.Bijective (@ofRing A) :=
-  ⟨ofRing_injective, ofRing_surjective⟩
+instance : Coe (ConvRing A) A where coe := toRing
+instance {B C} [CoeFun A (fun _ ↦ B → C)] : CoeFun (ConvRing A) (fun _ ↦ B → C) where
+  coe f := ⇑(f : A)
 
-instance [Add A] : Add (ConvRing A) where add x y := .ofRing (x.toRing + y.toRing)
-lemma add_def [Add A] (x y : ConvRing A) : x + y = .ofRing (x.toRing + y.toRing) := rfl
+@[ext] protected theorem ext {x y : ConvRing A}
+    (h : x.toRing = y.toRing) : x = y := toRing_injective h
 
-instance [Zero A] : Zero (ConvRing A) where zero := .ofRing 0
-lemma zero_def [Zero A] : (0 : ConvRing A) = .ofRing 0 := rfl
+variable (A) in
+/-- `WithLp.ofLp` and `WithLp.toLp` as an equivalence. -/
+protected def equiv : ConvRing A ≃ A where
+  toFun := toRing
+  invFun := ofRing
+  left_inv _ := rfl
+  right_inv _ := rfl
 
-instance [SMul R A] : SMul R (ConvRing A) where smul n a := .ofRing (n • a.toRing)
-lemma smul_def [SMul R A] (n : R) (a : ConvRing A) :
-    n • a = .ofRing (n • a.toRing) := rfl
+@[simp] lemma equiv_apply (x : ConvRing A) : ConvRing.equiv A x = x.toRing := rfl
+@[simp] lemma symm_equiv_apply (x : A) : (ConvRing.equiv A).symm x = ofRing x := rfl
 
-instance [Neg A] : Neg (ConvRing A) where neg x := .ofRing (-x.toRing)
-lemma neg_def [Neg A] (a : ConvRing A) : -a = .ofRing (-a.toRing) := rfl
+instance [Nontrivial A] : Nontrivial (ConvRing A) := (ConvRing.equiv A).nontrivial
+instance [Unique A] : Unique (ConvRing A) := (ConvRing.equiv A).unique
+instance [DecidableEq A] : DecidableEq (ConvRing A) := (ConvRing.equiv A).decidableEq
+instance [AddCommMonoid A] : AddCommMonoid (ConvRing A) := (ConvRing.equiv A).addCommMonoid
+instance [AddCommGroup A] : AddCommGroup (ConvRing A) := (ConvRing.equiv A).addCommGroup
+@[to_additive] instance [SMul R A] : SMul R (ConvRing A) := (ConvRing.equiv A).smul R
+@[to_additive] instance [Monoid R] [MulAction R A] : MulAction R (ConvRing A) :=
+  fast_instance% (ConvRing.equiv A).mulAction R
+instance [Monoid R] [AddCommMonoid A] [DistribMulAction R A] : DistribMulAction R (ConvRing A) :=
+  fast_instance% (ConvRing.equiv A).distribMulAction R
+instance [Semiring R] [AddCommMonoid A] [Module R A] : Module R (ConvRing A) :=
+  fast_instance% (ConvRing.equiv A).module R
 
-attribute [local simp] ConvRing.add_def ConvRing.zero_def ConvRing.smul_def ConvRing.neg_def
+section AddCommGroup
+variable [AddCommGroup A]
 
-instance [AddCommMonoid A] : AddCommMonoid (ConvRing A) where
-  add_assoc := by simp [add_assoc]
-  zero_add := by simp
-  add_zero := by simp
-  add_comm := by simp [add_comm]
-  nsmul n a := n • a
-  nsmul_zero := by simp
-  nsmul_succ := by simp [add_smul]
+@[simp] lemma toRing_sub (x y : A) : ofRing (x - y) = ofRing x - ofRing y := rfl
+@[simp] lemma ofRing_sub (x y : ConvRing A) : toRing (x - y) = toRing x - toRing y := rfl
 
-instance [AddCommGroup A] : AddCommGroup (ConvRing A) where
-  neg_add_cancel := by simp
-  zsmul n a := n • a
-  zsmul_zero' := by simp
-  zsmul_succ' := by simp [add_smul]
-  zsmul_neg' := by simp [add_smul]
+@[simp] lemma toRing_neg (x : ConvRing A) : toRing (-x) = -toRing x := rfl
+@[simp] lemma ofRing_neg (x : A) : ofRing (-x) = -ofRing x := rfl
 
-instance [AddCommMonoid A] [Semiring R] [Module R A] : Module R (ConvRing A) where
-  mul_smul := by simp [mul_smul]
-  one_smul := by simp
-  smul_zero := by simp
-  smul_add := by simp
-  add_smul := by simp [add_smul]
-  zero_smul := by simp
+end AddCommGroup
+
+@[simp] lemma toRing_smul [SMul R A] (c : R) (x : ConvRing A) : toRing (c • x) = c • toRing x := rfl
+@[simp] lemma ofRing_smul [SMul R A] (c : R) (x : A) : ofRing (c • x) = c • ofRing x := rfl
+
+variable [AddCommMonoid A]
+
+@[simp] lemma toRing_zero : toRing (0 : ConvRing A) = 0 := rfl
+@[simp] lemma ofRing_zero : ofRing (0 : A) = 0 := rfl
+
+@[simp] lemma toRing_add (x y : ConvRing A) : toRing (x + y) = toRing x + toRing y := rfl
+@[simp] lemma ofRing_add (x y : A) : ofRing (x + y) = ofRing x + ofRing y := rfl
+
+@[simp] lemma toRing_eq_zero {x : ConvRing A} : toRing x = 0 ↔ x = 0 := toRing_injective.eq_iff
+@[simp] lemma ofRing_eq_zero {x : A} : ofRing x = 0 ↔ x = 0 := ofRing_injective.eq_iff
+
+variable (A) in
+@[simps!] protected def addEquiv : ConvRing A ≃+ A where
+  __ := ConvRing.equiv A
+  map_add' := by simp
+
+@[simp] theorem toEquiv_addEquiv : (ConvRing.addEquiv A).toEquiv = ConvRing.equiv A := rfl
 
 variable (R A) in
-def linearEquiv [Semiring R] [AddCommMonoid A] [Module R A] : ConvRing A ≃ₗ[R] A where
-  toFun x := toRing x
-  invFun x := ofRing x
-  map_add' := by simp
+/-- The linear equivalence between `ConvRing A` and `A`. -/
+protected def linearEquiv [Semiring R] [Module R A] : ConvRing A ≃ₗ[R] A where
+  __ := ConvRing.addEquiv A
   map_smul' := by simp
 
-@[simp] lemma linearEquiv_apply [Semiring R] [AddCommMonoid A] [Module R A]
-    (a : ConvRing A) : linearEquiv R A a = toRing a := rfl
-@[simp] lemma symm_linearEquiv_apply [Semiring R] [AddCommMonoid A] [Module R A]
-    (a : A) : (linearEquiv R A).symm a = ofRing a := rfl
+@[simp] lemma linearEquiv_apply [Semiring R] [Module R A]
+    (a : ConvRing A) : ConvRing.linearEquiv R A a = toRing a := rfl
+@[simp] lemma symm_linearEquiv_apply [Semiring R] [Module R A]
+    (a : A) : (ConvRing.linearEquiv R A).symm a = ofRing a := rfl
 
-variable {B} [Semiring R] [AddCommMonoid A] [Module R A] [AddCommMonoid B] [Module R B]
+@[simp] lemma toAddEquiv_linearEquiv [Semiring R] [Module R A] :
+    (ConvRing.linearEquiv R A).toAddEquiv = ConvRing.addEquiv A := rfl
 
-instance : Coe (ConvRing (A →ₗ[R] B)) (A →ₗ[R] B) where coe := toRing
-instance : CoeFun (ConvRing (A →ₗ[R] B)) (fun _ ↦ A → B) where coe f := ⇑(f : A →ₗ[R] B)
+instance [Semiring R] [Module R A] [Module.Finite R A] :
+    Module.Finite R (ConvRing A) := Module.Finite.equiv (ConvRing.linearEquiv R A).symm
 
-@[ext] protected theorem ext {x y : ConvRing (A →ₗ[R] B)}
-    (h : ∀ i, x i = y i) : x = y := toRing_injective <| LinearMap.ext h
+@[simp] lemma toRing_sum {ι : Type*} (s : Finset ι) (f : ι → ConvRing A) :
+    (∑ i ∈ s, f i).toRing = ∑ i ∈ s, (f i).toRing := map_sum (ConvRing.addEquiv _) _ _
+
+@[simp] lemma ofRing_sum {ι : Type*} (s : Finset ι) (f : ι → A) :
+    ofRing (∑ i ∈ s, f i) = ∑ i ∈ s, ofRing (f i) := map_sum (ConvRing.addEquiv _).symm _ _
+
+@[simp] lemma toRing_listSum (l : List (ConvRing A)) :
+    l.sum.toRing = (l.map toRing).sum := map_list_sum (ConvRing.addEquiv _) _
+
+@[simp] lemma ofRing_listSum (l : List A) :
+    ofRing l.sum = (l.map ofRing).sum := map_list_sum (ConvRing.addEquiv _).symm _
+
+@[simp] lemma toRing_multisetSum (s : Multiset (ConvRing A)) :
+    s.sum.toRing = (s.map toRing).sum := map_multiset_sum (ConvRing.addEquiv _) _
+
+@[simp] lemma ofRing_multisetSum (s : Multiset A) :
+    ofRing s.sum = (s.map ofRing).sum := map_multiset_sum (ConvRing.addEquiv _).symm _
+
+section LinearMapComp
+variable {B C : Type*} [Semiring R] [Module R A] [AddCommMonoid B] [Module R B]
+  [AddCommMonoid C] [Module R C] (f : ConvRing (B →ₗ[R] C)) (g : ConvRing (A →ₗ[R] B))
+
+/-- The composition of linear maps as elements in `ConvRing`. -/
+protected def comp : ConvRing (A →ₗ[R] C) := ofRing (f.toRing ∘ₗ g.toRing)
+
+lemma comp_def : f.comp g = ofRing (f.toRing ∘ₗ g.toRing) := rfl
+@[simp] lemma comp_apply (x : A) : f.comp g x = f.toRing (g.toRing x) := rfl
+
+end LinearMapComp
 
 end ConvRing
