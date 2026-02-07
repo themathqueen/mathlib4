@@ -21,7 +21,7 @@ is star-preserving.
 
 ## Implementation notes
 
-Because there is a global `star` instance on `H →ₗ[𝕜] H` (defined as the linear amp adjoint on
+Because there is a global `star` instance on `H →ₗ[𝕜] H` (defined as the linear map adjoint on
 finite-dimensional Hilbert spaces), which is mathematically distinct from this `star`, we provide
 this instance on `ConvRing (E →ₗ[R] F)`.
 

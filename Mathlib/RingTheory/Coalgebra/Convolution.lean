@@ -31,7 +31,7 @@ diagrammatically, where `μ` stands for multiplication and `δ` for comultiplica
 
 ## Implementation notes
 
-Because there is a global multiplication instance on `Module.Ebnd R A` (defined as composition),
+Because there is a global multiplication instance on `Module.End R A` (defined as composition),
 which is mathematically distinct from this product, we provide this instance on
 `ConvRing (C →ₗ[R] A)`.
 -/

@@ -28,10 +28,8 @@ The instances for the convolutive product and intrinsic star are only available 
 
 Use `ConvRing.linearEquiv` to coerce into this type. -/
 structure ConvRing A where
-  /-- Converts an element of `A` to `ConvRing A`. -/
-  ofRing ::
-  /-- Converts an element of `ConvRing A` back to `A`. -/
-  toRing : A
+  /-- Converts an element of `A` to `ConvRing A`. -/ ofRing ::
+  /-- Converts an element of `ConvRing A` back to `A`. -/ toRing : A
 
 open Lean.PrettyPrinter.Delaborator in
 /-- This prevents `ofRing x` being printed as `{ toRing := x }` by `delabStructureInstance`. -/
