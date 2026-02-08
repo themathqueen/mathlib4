@@ -5,8 +5,9 @@ Authors: Lu-Ming Zhang
 -/
 module
 
-public import Mathlib.LinearAlgebra.Matrix.Trace
+public import Mathlib.Algebra.WithConv
 public import Mathlib.Data.Matrix.Basic
+public import Mathlib.LinearAlgebra.Matrix.Trace
 
 /-!
 # Hadamard product of matrices
@@ -192,4 +193,29 @@ end trace
 
 end BasicProperties
 
+section WithConv
+
+open Matrix WithConv
+
+instance [Mul α] : Mul (WithConv (Matrix m n α)) where mul a b := toConv (a.ofConv ⊙ b.ofConv)
+
+lemma convMul_def [Mul α] (x y : WithConv (Matrix m n α)) :
+    x * y = toConv (x.ofConv ⊙ y.ofConv) := rfl
+
+instance [Semigroup α] : Semigroup (WithConv (Matrix m n α)) where
+  mul_assoc _ _ _ := by simp [convMul_def, hadamard_assoc]
+
+instance [NonUnitalNonAssocSemiring α] : NonUnitalNonAssocSemiring (WithConv (Matrix m n α)) where
+  left_distrib _ _ _ := by simp [convMul_def, hadamard_add]
+  right_distrib _ _ _ := by simp [convMul_def, add_hadamard]
+  zero_mul := by simp [convMul_def]
+  mul_zero := by simp [convMul_def]
+
+instance [NonUnitalSemiring α] : NonUnitalSemiring (WithConv (Matrix m n α)) where
+
+instance [One α] : One (WithConv (Matrix m n α)) where one := toConv (of 1)
+
+lemma convOne_def [One α] : (1 : WithConv (Matrix m n α)) = toConv (of 1) := rfl
+
+end WithConv
 end Matrix
