@@ -836,7 +836,6 @@ public import Mathlib.Algebra.NoZeroSMulDivisors.Prod
 public import Mathlib.Algebra.NonAssoc.LieAdmissible.Defs
 public import Mathlib.Algebra.NonAssoc.PreLie.Basic
 public import Mathlib.Algebra.Notation
-public import Mathlib.Algebra.Notation.ConvRing
 public import Mathlib.Algebra.Notation.Defs
 public import Mathlib.Algebra.Notation.FiniteSupport
 public import Mathlib.Algebra.Notation.Indicator
@@ -845,6 +844,7 @@ public import Mathlib.Algebra.Notation.Pi.Basic
 public import Mathlib.Algebra.Notation.Pi.Defs
 public import Mathlib.Algebra.Notation.Prod
 public import Mathlib.Algebra.Notation.Support
+public import Mathlib.Algebra.Notation.WithConv
 public import Mathlib.Algebra.Opposites
 public import Mathlib.Algebra.Order.AbsoluteValue.Basic
 public import Mathlib.Algebra.Order.AbsoluteValue.Euclidean
