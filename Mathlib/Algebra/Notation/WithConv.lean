@@ -91,7 +91,6 @@ variable [AddCommGroup A]
 
 @[simp] lemma toConv_sub (x y : A) : toConv (x - y) = toConv x - toConv y := rfl
 @[simp] lemma ofConv_sub (x y : WithConv A) : ofConv (x - y) = ofConv x - ofConv y := rfl
-
 @[simp] lemma ofConv_neg (x : WithConv A) : ofConv (-x) = -ofConv x := rfl
 @[simp] lemma toConv_neg (x : A) : toConv (-x) = -toConv x := rfl
 
@@ -104,10 +103,8 @@ variable [AddCommMonoid A]
 
 @[simp] lemma ofConv_zero : ofConv (0 : WithConv A) = 0 := rfl
 @[simp] lemma toConv_zero : toConv (0 : A) = 0 := rfl
-
 @[simp] lemma ofConv_add (x y : WithConv A) : ofConv (x + y) = ofConv x + ofConv y := rfl
 @[simp] lemma toConv_add (x y : A) : toConv (x + y) = toConv x + toConv y := rfl
-
 @[simp] lemma ofConv_eq_zero {x : WithConv A} : ofConv x = 0 ↔ x = 0 := ofConv_injective.eq_iff
 @[simp] lemma toConv_eq_zero {x : A} : toConv x = 0 ↔ x = 0 := toConv_injective.eq_iff
 
@@ -129,29 +126,23 @@ protected def linearEquiv [Semiring R] [Module R A] : WithConv A ≃ₗ[R] A whe
     (a : WithConv A) : WithConv.linearEquiv R A a = ofConv a := rfl
 @[simp] lemma symm_linearEquiv_apply [Semiring R] [Module R A]
     (a : A) : (WithConv.linearEquiv R A).symm a = toConv a := rfl
-
 @[simp] lemma toAddEquiv_linearEquiv [Semiring R] [Module R A] :
     (WithConv.linearEquiv R A).toAddEquiv = WithConv.addEquiv A := rfl
 
 @[simp] lemma ofConv_sum {ι : Type*} (s : Finset ι) (f : ι → WithConv A) :
     (∑ i ∈ s, f i).ofConv = ∑ i ∈ s, (f i).ofConv := map_sum (WithConv.addEquiv _) _ _
-
 @[simp] lemma toConv_sum {ι : Type*} (s : Finset ι) (f : ι → A) :
     toConv (∑ i ∈ s, f i) = ∑ i ∈ s, toConv (f i) := map_sum (WithConv.addEquiv _).symm _ _
-
 @[simp] lemma ofConv_listSum (l : List (WithConv A)) :
     l.sum.ofConv = (l.map ofConv).sum := map_list_sum (WithConv.addEquiv _) _
-
 @[simp] lemma toConv_listSum (l : List A) :
     toConv l.sum = (l.map toConv).sum := map_list_sum (WithConv.addEquiv _).symm _
-
 @[simp] lemma ofConv_multisetSum (s : Multiset (WithConv A)) :
     s.sum.ofConv = (s.map ofConv).sum := map_multiset_sum (WithConv.addEquiv _) _
-
 @[simp] lemma toConv_multisetSum (s : Multiset A) :
     toConv s.sum = (s.map toConv).sum := map_multiset_sum (WithConv.addEquiv _).symm _
 
-section LinearMapComp
+section
 variable {B C : Type*} [Semiring R] [Module R A] [AddCommMonoid B] [Module R B]
   [AddCommMonoid C] [Module R C] (f : WithConv (B →ₗ[R] C)) (g : WithConv (A →ₗ[R] B))
 
@@ -161,6 +152,16 @@ protected def comp : WithConv (A →ₗ[R] C) := toConv (f.ofConv ∘ₗ g.ofCon
 lemma comp_def : f.comp g = toConv (f.ofConv ∘ₗ g.ofConv) := rfl
 @[simp] lemma comp_apply (x : A) : f.comp g x = f.ofConv (g.ofConv x) := rfl
 
-end LinearMapComp
+/-- Lift a linear equivalence between `A` and `B` to `WithConv A` and `WithConv B`. -/
+protected def congr (f : A ≃ₗ[R] B) : WithConv A ≃ₗ[R] WithConv B :=
+  (WithConv.linearEquiv R A).trans (f.trans (WithConv.linearEquiv R B).symm)
+
+@[simp] lemma congr_apply (f : A ≃ₗ[R] B) (x : WithConv A) :
+    WithConv.congr f x = toConv (f x.ofConv) := rfl
+@[simp] lemma symm_congr (f : A ≃ₗ[R] B) : (WithConv.congr f).symm = WithConv.congr f.symm := rfl
+lemma symm_congr_apply (f : A ≃ₗ[R] B) (x : WithConv B) :
+    (WithConv.congr f).symm x = toConv (f.symm x.ofConv) := by simp
+
+end
 
 end WithConv
