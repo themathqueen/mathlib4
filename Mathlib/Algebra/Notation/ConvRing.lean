@@ -14,7 +14,7 @@ public import Mathlib.RingTheory.Finiteness.Basic
 
 This files provides the type synonym `ConvRing` which we will use in later files
 to put the convolutive product on linear maps instance and the intrinsic star instance.
-This is to insure that we only have one multiplication, one unit, and one star.
+This is to ensure that we only have one multiplication, one unit, and one star.
 
 This is given for any type `A` so that we can have `ConvRing (A →ₗ[R] B)` as well as
 `ConvRing (A →L[R] B)`.
