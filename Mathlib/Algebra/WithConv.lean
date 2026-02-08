@@ -76,6 +76,7 @@ protected def equiv : WithConv A ≃ A where
 instance [Nontrivial A] : Nontrivial (WithConv A) := (WithConv.equiv A).nontrivial
 instance [Unique A] : Unique (WithConv A) := (WithConv.equiv A).unique
 instance [DecidableEq A] : DecidableEq (WithConv A) := (WithConv.equiv A).decidableEq
+instance [AddMonoid A] : AddMonoid (WithConv A) := (WithConv.equiv A).addMonoid
 instance [AddCommMonoid A] : AddCommMonoid (WithConv A) := (WithConv.equiv A).addCommMonoid
 instance [AddCommGroup A] : AddCommGroup (WithConv A) := (WithConv.equiv A).addCommGroup
 @[to_additive] instance [SMul R A] : SMul R (WithConv A) := (WithConv.equiv A).smul R
@@ -109,7 +110,8 @@ end AddCommGroup
 @[simp] lemma ofConv_smul [SMul R A] (c : R) (x : WithConv A) : ofConv (c • x) = c • ofConv x := rfl
 @[simp] lemma toConv_smul [SMul R A] (c : R) (x : A) : toConv (c • x) = c • toConv x := rfl
 
-variable [AddCommMonoid A]
+section
+variable [AddMonoid A]
 
 @[simp] lemma ofConv_zero : ofConv (0 : WithConv A) = 0 := rfl
 @[simp] lemma toConv_zero : toConv (0 : A) = 0 := rfl
@@ -125,6 +127,10 @@ variable (A) in
   map_add' := by simp
 
 @[simp] theorem toEquiv_addEquiv : (WithConv.addEquiv A : WithConv A ≃ A) = WithConv.equiv A := rfl
+
+end
+
+variable [AddCommMonoid A]
 
 variable (R A) in
 /-- The linear equivalence between `WithConv A` and `A`. -/
