@@ -163,15 +163,17 @@ lemma comp_def : f.comp g = toConv (f.ofConv ∘ₗ g.ofConv) := rfl
 @[simp] lemma comp_apply (x : A) : f.comp g x = f.ofConv (g.ofConv x) := rfl
 
 /-- Lift a linear equivalence between `A` and `B` to `WithConv A` and `WithConv B`. -/
-def congrLinear (f : A ≃ₗ[R] B) : WithConv A ≃ₗ[R] WithConv B :=
+def congrLinearEquiv (f : A ≃ₗ[R] B) : WithConv A ≃ₗ[R] WithConv B :=
   (WithConv.linearEquiv R A).trans (f.trans (WithConv.linearEquiv R B).symm)
 
-@[simp] lemma congrLinear_apply (f : A ≃ₗ[R] B) (x : WithConv A) :
-    congrLinear f x = toConv (f x.ofConv) := rfl
-@[simp] lemma symm_congrLinear (f : A ≃ₗ[R] B) :
-    (congrLinear f).symm = congrLinear f.symm := rfl
-lemma symm_congrLinear_apply (f : A ≃ₗ[R] B) (x : WithConv B) :
-    (congrLinear f).symm x = toConv (f.symm x.ofConv) := by simp
+@[simp] lemma congrLinearEquiv_apply (f : A ≃ₗ[R] B) (x : WithConv A) :
+    congrLinearEquiv f x = toConv (f x.ofConv) := rfl
+@[simp] lemma symm_congrLinearEquiv (f : A ≃ₗ[R] B) :
+    (congrLinearEquiv f).symm = congrLinearEquiv f.symm := rfl
+lemma symm_congrLinearEquiv_apply (f : A ≃ₗ[R] B) (x : WithConv B) :
+    (congrLinearEquiv f).symm x = toConv (f.symm x.ofConv) := by simp
+@[simp] theorem toEquiv_congrLinearEquiv (f : A ≃ₗ[R] B) :
+    (congrLinearEquiv f).toEquiv = WithConv.congr f.toEquiv := rfl
 
 end
 
