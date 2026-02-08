@@ -844,7 +844,6 @@ public import Mathlib.Algebra.Notation.Pi.Basic
 public import Mathlib.Algebra.Notation.Pi.Defs
 public import Mathlib.Algebra.Notation.Prod
 public import Mathlib.Algebra.Notation.Support
-public import Mathlib.Algebra.Notation.WithConv
 public import Mathlib.Algebra.Opposites
 public import Mathlib.Algebra.Order.AbsoluteValue.Basic
 public import Mathlib.Algebra.Order.AbsoluteValue.Euclidean
@@ -1259,6 +1258,7 @@ public import Mathlib.Algebra.Tropical.BigOperators
 public import Mathlib.Algebra.Tropical.Lattice
 public import Mathlib.Algebra.Vertex.HVertexOperator
 public import Mathlib.Algebra.Vertex.VertexOperator
+public import Mathlib.Algebra.WithConv
 public import Mathlib.AlgebraicGeometry.AffineScheme
 public import Mathlib.AlgebraicGeometry.AffineSpace
 public import Mathlib.AlgebraicGeometry.AffineTransitionLimit
