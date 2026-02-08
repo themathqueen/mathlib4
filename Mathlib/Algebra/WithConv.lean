@@ -36,7 +36,7 @@ open Lean.PrettyPrinter.Delaborator in
 meta def WithConv.delabtoConv : Delab := delabApp
 
 namespace WithConv
-variable {R A : Type*}
+variable {R A B C : Type*}
 
 lemma ofConv_toConv (x : A) : ofConv (toConv x) = x := rfl
 @[simp] lemma toConv_ofConv (x : WithConv A) : toConv (ofConv x) = x := rfl
@@ -85,6 +85,16 @@ instance [Monoid R] [AddCommMonoid A] [DistribMulAction R A] : DistribMulAction 
   fast_instance% (WithConv.equiv A).distribMulAction R
 instance [Semiring R] [AddCommMonoid A] [Module R A] : Module R (WithConv A) :=
   fast_instance% (WithConv.equiv A).module R
+
+/-- Lift an equivalence between `A` and `B` to `WithConv A` and `WithConv B`. -/
+protected def congr (f : A ≃ B) : WithConv A ≃ WithConv B :=
+  (WithConv.equiv A).trans (f.trans (WithConv.equiv B).symm)
+
+@[simp] lemma congr_apply (f : A ≃ B) (x : WithConv A) :
+    WithConv.congr f x = toConv (f x.ofConv) := rfl
+@[simp] lemma symm_congr (f : A ≃ B) : (WithConv.congr f).symm = WithConv.congr f.symm := rfl
+lemma symm_congr_apply (f : A ≃ B) (x : WithConv B) :
+    (WithConv.congr f).symm x = toConv (f.symm x.ofConv) := by simp
 
 section AddCommGroup
 variable [AddCommGroup A]
@@ -143,7 +153,7 @@ protected def linearEquiv [Semiring R] [Module R A] : WithConv A ≃ₗ[R] A whe
     toConv s.sum = (s.map toConv).sum := map_multiset_sum (WithConv.addEquiv _).symm _
 
 section
-variable {B C : Type*} [Semiring R] [Module R A] [AddCommMonoid B] [Module R B]
+variable [Semiring R] [Module R A] [AddCommMonoid B] [Module R B]
   [AddCommMonoid C] [Module R C] (f : WithConv (B →ₗ[R] C)) (g : WithConv (A →ₗ[R] B))
 
 /-- The composition of linear maps as elements in `WithConv`. -/
@@ -153,14 +163,15 @@ lemma comp_def : f.comp g = toConv (f.ofConv ∘ₗ g.ofConv) := rfl
 @[simp] lemma comp_apply (x : A) : f.comp g x = f.ofConv (g.ofConv x) := rfl
 
 /-- Lift a linear equivalence between `A` and `B` to `WithConv A` and `WithConv B`. -/
-protected def congr (f : A ≃ₗ[R] B) : WithConv A ≃ₗ[R] WithConv B :=
+def congrLinear (f : A ≃ₗ[R] B) : WithConv A ≃ₗ[R] WithConv B :=
   (WithConv.linearEquiv R A).trans (f.trans (WithConv.linearEquiv R B).symm)
 
-@[simp] lemma congr_apply (f : A ≃ₗ[R] B) (x : WithConv A) :
-    WithConv.congr f x = toConv (f x.ofConv) := rfl
-@[simp] lemma symm_congr (f : A ≃ₗ[R] B) : (WithConv.congr f).symm = WithConv.congr f.symm := rfl
-lemma symm_congr_apply (f : A ≃ₗ[R] B) (x : WithConv B) :
-    (WithConv.congr f).symm x = toConv (f.symm x.ofConv) := by simp
+@[simp] lemma congrLinear_apply (f : A ≃ₗ[R] B) (x : WithConv A) :
+    congrLinear f x = toConv (f x.ofConv) := rfl
+@[simp] lemma symm_congrLinear (f : A ≃ₗ[R] B) :
+    (congrLinear f).symm = congrLinear f.symm := rfl
+lemma symm_congrLinear_apply (f : A ≃ₗ[R] B) (x : WithConv B) :
+    (congrLinear f).symm x = toConv (f.symm x.ofConv) := by simp
 
 end
 
