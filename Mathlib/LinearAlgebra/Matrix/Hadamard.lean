@@ -148,20 +148,6 @@ theorem one_hadamard_eq_one_iff {A : Matrix n n α} : 1 ⊙ A = 1 ↔ A.diag = 1
 theorem hadamard_one_eq_one_iff {A : Matrix n n α} : A ⊙ 1 = 1 ↔ A.diag = 1 :=
   hadamard_one_eq_diagonal_iff
 
-theorem one_hadamard_eq_zero_iff {A : Matrix n n α} : 1 ⊙ A = 0 ↔ A.diag = 0 := by
-  simp [← ext_iff, funext_iff, Matrix.one_apply]
-
-theorem hadamard_one_eq_zero_iff {A : Matrix n n α} : A ⊙ 1 = 0 ↔ A.diag = 0 := by
-  simp [← ext_iff, funext_iff, Matrix.one_apply]
-
-theorem one_hadamard_eq_one_iff {A : Matrix n n α} : 1 ⊙ A = 1 ↔ A.diag = 1 := by
-  simp_rw [one_hadamard, ← diagonal_one, diagonal_eq_diagonal_iff]
-  simp [funext_iff, diag_apply]
-
-theorem hadamard_one_eq_one_iff {A : Matrix n n α} : A ⊙ 1 = 1 ↔ A.diag = 1 := by
-  simp_rw [hadamard_one, ← diagonal_one, diagonal_eq_diagonal_iff]
-  simp [funext_iff, diag_apply]
-
 end One
 
 @[simp] theorem hadamard_of_one [MulOneClass α] (A : Matrix m n α) :
