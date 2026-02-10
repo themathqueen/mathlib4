@@ -122,7 +122,7 @@ theorem _root_.TensorProduct.intrinsicStar_map
     star (toConv (TensorProduct.map f.ofConv g.ofConv)) =
       toConv (TensorProduct.map (star f).ofConv (star g).ofConv) :=
   WithConv.ext <| TensorProduct.ext' fun _ _ ↦ by simp
-  
+
 theorem _root_.TensorProduct.star_map_apply_eq_map_intrinsicStar
     (f : E →ₗ[R] F) (g : G →ₗ[R] H) (x) :
     star (TensorProduct.map f g x) = TensorProduct.map (star f) (star g) (star x) := by
