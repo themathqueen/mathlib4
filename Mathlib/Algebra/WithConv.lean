@@ -30,12 +30,13 @@ structure WithConv A where
   /-- Converts an element of `A` to `WithConv A`. -/ toConv ::
   /-- Converts an element of `WithConv A` back to `A`. -/ ofConv : A
 
+namespace WithConv
+
 open Lean.PrettyPrinter.Delaborator in
 /-- This prevents `toConv x` being printed as `{ ofConv := x }` by `delabStructureInstance`. -/
-@[app_delab WithConv.toConv]
-meta def WithConv.delabtoConv : Delab := delabApp
+@[app_delab toConv]
+meta def delabToConv : Delab := delabApp
 
-namespace WithConv
 variable {R A B C : Type*}
 
 lemma ofConv_toConv (x : A) : ofConv (toConv x) = x := rfl
@@ -56,8 +57,7 @@ lemma toConv_injective : Function.Injective (@toConv A) :=
 lemma ofConv_bijective : Function.Bijective (@ofConv A) := ⟨ofConv_injective, ofConv_surjective⟩
 lemma toConv_bijective : Function.Bijective (@toConv A) := ⟨toConv_injective, toConv_surjective⟩
 
-instance {B C} [CoeFun A (fun _ ↦ B → C)] : CoeFun (WithConv A) (fun _ ↦ B → C) where
-  coe f := ⇑f.ofConv
+instance [CoeFun A (fun _ ↦ B → C)] : CoeFun (WithConv A) (fun _ ↦ B → C) where coe f := ⇑f.ofConv
 
 @[ext] protected theorem ext {x y : WithConv A}
     (h : x.ofConv = y.ofConv) : x = y := ofConv_injective h
@@ -78,8 +78,8 @@ instance [Unique A] : Unique (WithConv A) := (WithConv.equiv A).unique
 instance [DecidableEq A] : DecidableEq (WithConv A) := (WithConv.equiv A).decidableEq
 instance [AddMonoid A] : AddMonoid (WithConv A) := (WithConv.equiv A).addMonoid
 instance [AddCommMonoid A] : AddCommMonoid (WithConv A) := (WithConv.equiv A).addCommMonoid
+instance [AddGroup A] : AddGroup (WithConv A) := (WithConv.equiv A).addGroup
 instance [AddCommGroup A] : AddCommGroup (WithConv A) := (WithConv.equiv A).addCommGroup
-@[to_additive] instance [SMul R A] : SMul R (WithConv A) := (WithConv.equiv A).smul R
 @[to_additive] instance [Monoid R] [MulAction R A] : MulAction R (WithConv A) :=
   fast_instance% (WithConv.equiv A).mulAction R
 instance [Monoid R] [AddCommMonoid A] [DistribMulAction R A] : DistribMulAction R (WithConv A) :=
@@ -87,28 +87,20 @@ instance [Monoid R] [AddCommMonoid A] [DistribMulAction R A] : DistribMulAction 
 instance [Semiring R] [AddCommMonoid A] [Module R A] : Module R (WithConv A) :=
   fast_instance% (WithConv.equiv A).module R
 
-/-- Lift an equivalence between `A` and `B` to `WithConv A` and `WithConv B`. -/
-protected def congr (f : A ≃ B) : WithConv A ≃ WithConv B :=
-  (WithConv.equiv A).trans (f.trans (WithConv.equiv B).symm)
-
-@[simp] lemma congr_apply (f : A ≃ B) (x : WithConv A) :
-    WithConv.congr f x = toConv (f x.ofConv) := rfl
-@[simp] lemma symm_congr (f : A ≃ B) : (WithConv.congr f).symm = WithConv.congr f.symm := rfl
-lemma symm_congr_apply (f : A ≃ B) (x : WithConv B) :
-    (WithConv.congr f).symm x = toConv (f.symm x.ofConv) := by simp
-
-section AddCommGroup
-variable [AddCommGroup A]
+section AddGroup
+variable [AddGroup A]
 
 @[simp] lemma toConv_sub (x y : A) : toConv (x - y) = toConv x - toConv y := rfl
 @[simp] lemma ofConv_sub (x y : WithConv A) : ofConv (x - y) = ofConv x - ofConv y := rfl
 @[simp] lemma ofConv_neg (x : WithConv A) : ofConv (-x) = -ofConv x := rfl
 @[simp] lemma toConv_neg (x : A) : toConv (-x) = -toConv x := rfl
 
-end AddCommGroup
+end AddGroup
 
-@[simp] lemma ofConv_smul [SMul R A] (c : R) (x : WithConv A) : ofConv (c • x) = c • ofConv x := rfl
-@[simp] lemma toConv_smul [SMul R A] (c : R) (x : A) : toConv (c • x) = c • toConv x := rfl
+@[simp] lemma ofConv_smul [Monoid R] [MulAction R A] (c : R) (x : WithConv A) :
+    ofConv (c • x) = c • ofConv x := rfl
+@[simp] lemma toConv_smul [Monoid R] [MulAction R A] (c : R) (x : A) :
+    toConv (c • x) = c • toConv x := rfl
 
 section
 variable [AddMonoid A]
@@ -157,30 +149,5 @@ protected def linearEquiv [Semiring R] [Module R A] : WithConv A ≃ₗ[R] A whe
     s.sum.ofConv = (s.map ofConv).sum := map_multiset_sum (WithConv.addEquiv _) _
 @[simp] lemma toConv_multisetSum (s : Multiset A) :
     toConv s.sum = (s.map toConv).sum := map_multiset_sum (WithConv.addEquiv _).symm _
-
-section
-variable [Semiring R] [Module R A] [AddCommMonoid B] [Module R B]
-  [AddCommMonoid C] [Module R C] (f : WithConv (B →ₗ[R] C)) (g : WithConv (A →ₗ[R] B))
-
-/-- The composition of linear maps as elements in `WithConv`. -/
-protected def comp : WithConv (A →ₗ[R] C) := toConv (f.ofConv ∘ₗ g.ofConv)
-
-lemma comp_def : f.comp g = toConv (f.ofConv ∘ₗ g.ofConv) := rfl
-@[simp] lemma comp_apply (x : A) : f.comp g x = f.ofConv (g.ofConv x) := rfl
-
-/-- Lift a linear equivalence between `A` and `B` to `WithConv A` and `WithConv B`. -/
-def congrLinearEquiv (f : A ≃ₗ[R] B) : WithConv A ≃ₗ[R] WithConv B :=
-  (WithConv.linearEquiv R A).trans (f.trans (WithConv.linearEquiv R B).symm)
-
-@[simp] lemma congrLinearEquiv_apply (f : A ≃ₗ[R] B) (x : WithConv A) :
-    congrLinearEquiv f x = toConv (f x.ofConv) := rfl
-@[simp] lemma symm_congrLinearEquiv (f : A ≃ₗ[R] B) :
-    (congrLinearEquiv f).symm = congrLinearEquiv f.symm := rfl
-lemma symm_congrLinearEquiv_apply (f : A ≃ₗ[R] B) (x : WithConv B) :
-    (congrLinearEquiv f).symm x = toConv (f.symm x.ofConv) := by simp
-@[simp] theorem toEquiv_congrLinearEquiv (f : A ≃ₗ[R] B) :
-    (congrLinearEquiv f).toEquiv = WithConv.congr f.toEquiv := rfl
-
-end
 
 end WithConv
