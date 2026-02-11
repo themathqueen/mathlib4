@@ -85,7 +85,7 @@ theorem intrinsicStar_comp (f : WithConv (E →ₗ[R] F)) (g : WithConv (G →�
   ext; simp
 
 theorem intrinsicStar_comp' (f : E →ₗ[R] F) (g : G →ₗ[R] E) :
-    star (toConv (f ∘ₗ g)) = toConv ((star (toConv f)).ofConv ∘ₗ ((star (toConv g)).ofConv)) := by
+    star (toConv (f ∘ₗ g)) = toConv ((star (toConv f)).ofConv ∘ₗ (star (toConv g)).ofConv) := by
   simpa using intrinsicStar_comp _ _
 
 @[simp] theorem intrinsicStar_id :
