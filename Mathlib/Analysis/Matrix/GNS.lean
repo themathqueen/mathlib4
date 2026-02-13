@@ -16,6 +16,8 @@ to `Matrix.toMatrixInnerProductSpace`.
 So choosing a positive linear map `Matrix n n ℂ →ₚ[ℂ] ℂ` is equivalent to choosing
 a positive semi-definite matrix `Q`. -/
 
+@[expose] public section
+
 variable {n m R 𝕜 : Type*} [Fintype n] [DecidableEq n] [RCLike 𝕜]
 
 open scoped MatrixOrder ComplexOrder
