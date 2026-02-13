@@ -190,9 +190,9 @@ theorem IntrinsicStar.isSelfAdjoint_toLin'_iff (A : Matrix n m R) :
 /-- A matrix is symmetric if the intrinsic star of its linear map is equal to the
 conjugate transpose. -/
 theorem isSymm_iff_intrinsicStar_toLin' {A : Matrix m m R} :
-    A.IsSymm ↔ star A.toLin' = (star A).toLin' := by
-  rw [intrinsicStar_toLin', toLin'.injective.eq_iff, ← transpose_conjTranspose,
-    star_eq_conjTranspose, conjTranspose_inj, IsSymm]
+    A.IsSymm ↔ star (toConv A.toLin') = toConv (star A).toLin' := by
+  rw [intrinsicStar_toLin', toConv_injective.eq_iff, toLin'.injective.eq_iff,
+    ← transpose_conjTranspose, star_eq_conjTranspose, conjTranspose_inj, IsSymm]
 
 end Matrix
 end matrix
