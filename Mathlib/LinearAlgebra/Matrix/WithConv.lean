@@ -44,10 +44,13 @@ lemma convOne_def [One α] : (1 : WithConv (Matrix m n α)) = toConv (of 1) := r
 
 attribute [local simp] convOne_def
 
-instance [NonAssocSemiring α] : NonAssocSemiring (WithConv (Matrix m n α)) where
+instance [MulOneClass α] : MulOneClass (WithConv (Matrix m n α)) where
   one_mul := by simp
   mul_one := by simp
 
+instance [Monoid α] : Monoid (WithConv (Matrix m n α)) where
+instance [CommMonoid α] : CommMonoid (WithConv (Matrix m n α)) where
+instance [NonAssocSemiring α] : NonAssocSemiring (WithConv (Matrix m n α)) where
 instance [NonUnitalSemiring α] : NonUnitalSemiring (WithConv (Matrix m n α)) where
 instance [NonUnitalNonAssocCommSemiring α] :
     NonUnitalNonAssocCommSemiring (WithConv (Matrix m n α)) where
