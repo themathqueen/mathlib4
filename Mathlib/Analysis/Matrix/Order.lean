@@ -21,7 +21,7 @@ This allows us to use more general results from C⋆-algebras, like `CFC.sqrt`.
 
 * `Matrix.instPartialOrder`: the partial order on matrices given by `x ≤ y := (y - x).PosSemidef`.
 * `Matrix.PosSemidef.dotProduct_mulVec_zero_iff`: for a positive semi-definite matrix `A`,
-we have `x⋆ A x = 0` iff `A x = 0`.
+  we have `x⋆ A x = 0` iff `A x = 0`.
 
 ## Implementation notes
 
