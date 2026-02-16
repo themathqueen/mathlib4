@@ -197,14 +197,10 @@ noncomputable def gnsStarAlgHom : A →⋆ₐ[ℂ] (f.GNS →L[ℂ] f.GNS) where
 
 /-- A version of `norm_apply_le_of_nonneg` for functionals. -/
 lemma norm_apply_le (f : A →ₚ[ℂ] ℂ) (x : A) : ‖f x‖ ≤ ‖f 1‖ * ‖x‖ := by
-  have := by simpa [f.preGNS_norm_def, f.preGNS_inner_def] using
+  have := by simpa [f.preGNS_norm_def, f.preGNS_inner_def, re_eq_norm.mpr <| f.map_nonneg _] using
     norm_inner_le_norm (𝕜 := ℂ) (f.toPreGNS 1) (f.toPreGNS x)
-  grw [this]
-  simp only [Complex.re_eq_norm.mpr <| f.map_nonneg _, star_mul_self_nonneg, zero_le_one]
-  rw [← sq_le_sq₀ (by positivity) (by positivity)]
-  simp only [mul_pow, norm_nonneg, Real.sq_sqrt]
-  simp_rw [sq, mul_assoc]
-  refine mul_le_mul_of_nonneg_left ?_ (by positivity)
+  grw [this, ← Real.sqrt_mul (norm_nonneg _), Real.sqrt_le_iff, mul_pow, sq, sq, mul_assoc]
+  refine ⟨by positivity, mul_le_mul_of_nonneg_left ?_ (by positivity)⟩
   simp [← CStarRing.norm_star_mul_self, f.norm_apply_le_of_nonneg]
 
 theorem opNorm_eq_norm_map_one (f : A →ₚ[ℂ] ℂ) : ‖f.toContinuousLinearMap‖ = ‖f 1‖ := by
