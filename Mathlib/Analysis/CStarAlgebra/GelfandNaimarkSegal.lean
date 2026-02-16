@@ -195,20 +195,19 @@ noncomputable def gnsStarAlgHom : A →⋆ₐ[ℂ] (f.GNS →L[ℂ] f.GNS) where
   map_one' := by simp
   commutes' r := by simp [Algebra.algebraMap_eq_smul_one]
 
+/-- A version of `norm_apply_le_of_nonneg` for functionals. -/
 lemma norm_apply_le (f : A →ₚ[ℂ] ℂ) (x : A) : ‖f x‖ ≤ ‖f 1‖ * ‖x‖ := by
   have := by simpa [f.preGNS_norm_def, f.preGNS_inner_def] using
     norm_inner_le_norm (𝕜 := ℂ) (f.toPreGNS 1) (f.toPreGNS x)
-  have hf := Complex.nonneg_iff.mp (f.map_nonneg zero_le_one) |>.1
-  grw [this, ← Complex.re_eq_norm.mpr <| f.map_nonneg zero_le_one,
-    ← sq_le_sq₀ (by positivity) (mul_nonneg hf (by positivity))]
-  simp_rw [mul_pow, Real.sq_sqrt hf, sq, mul_assoc, ← sq, Real.sq_sqrt
-    (Complex.nonneg_iff.mp (f.map_nonneg (star_mul_self_nonneg _))).1]
-  refine mul_le_mul_of_nonneg_left ?_ hf
-  simp [Complex.re_eq_norm.mpr (f.map_nonneg _), sq, ← CStarRing.norm_star_mul_self,
-    f.norm_apply_le_of_nonneg]
+  grw [this]
+  simp only [Complex.re_eq_norm.mpr <| f.map_nonneg _, star_mul_self_nonneg, zero_le_one]
+  rw [← sq_le_sq₀ (by positivity) (by positivity)]
+  simp only [mul_pow, norm_nonneg, Real.sq_sqrt]
+  simp_rw [sq, mul_assoc]
+  refine mul_le_mul_of_nonneg_left ?_ (by positivity)
+  simp [← CStarRing.norm_star_mul_self, f.norm_apply_le_of_nonneg]
 
-theorem opNorm_eq_norm_map_one (f : A →ₚ[ℂ] ℂ) :
-    ‖f.toContinuousLinearMap‖ = ‖f 1‖ := by
+theorem opNorm_eq_norm_map_one (f : A →ₚ[ℂ] ℂ) : ‖f.toContinuousLinearMap‖ = ‖f 1‖ := by
   refine le_antisymm (f.toContinuousLinearMap.opNorm_le_bound (by positivity) f.norm_apply_le) ?_
   by_cases! Subsingleton A
   · simp [Subsingleton.eq_zero (1 : A)]
