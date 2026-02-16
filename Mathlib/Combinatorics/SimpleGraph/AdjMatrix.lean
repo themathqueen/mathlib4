@@ -83,8 +83,8 @@ theorem apply_ne_zero_iff [MulZeroOneClass α] [Nontrivial α] (h : IsAdjMatrix 
 @[simps]
 def toGraph [MulZeroOneClass α] [Nontrivial α] (h : IsAdjMatrix A) : SimpleGraph V where
   Adj i j := A i j = 1
-  symm i j hij := by simpa [h.symm.apply i j]
-  loopless i := by simp [h]
+  symm i j hij := by simp only; rwa [h.symm.apply i j]
+  loopless := ⟨fun i ↦ by simp [h]⟩
 
 instance [MulZeroOneClass α] [Nontrivial α] [DecidableEq α] (h : IsAdjMatrix A) :
     DecidableRel h.toGraph.Adj := by
