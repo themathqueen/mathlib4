@@ -195,11 +195,12 @@ noncomputable def gnsStarAlgHom : A →⋆ₐ[ℂ] (f.GNS →L[ℂ] f.GNS) where
   map_one' := by simp
   commutes' r := by simp [Algebra.algebraMap_eq_smul_one]
 
-lemma norm_apply_le (f : A →ₚ[ℂ] ℂ) (x : A) : ‖f x‖ ≤ (f 1).re * ‖x‖ := by
+lemma norm_apply_le (f : A →ₚ[ℂ] ℂ) (x : A) : ‖f x‖ ≤ ‖f 1‖ * ‖x‖ := by
   have := by simpa [f.preGNS_norm_def, f.preGNS_inner_def] using
     norm_inner_le_norm (𝕜 := ℂ) (f.toPreGNS 1) (f.toPreGNS x)
   have hf := Complex.nonneg_iff.mp (f.map_nonneg zero_le_one) |>.1
-  grw [this, ← sq_le_sq₀ (by positivity) (mul_nonneg hf (by positivity))]
+  grw [this, ← Complex.re_eq_norm.mpr <| f.map_nonneg zero_le_one,
+    ← sq_le_sq₀ (by positivity) (mul_nonneg hf (by positivity))]
   simp_rw [mul_pow, Real.sq_sqrt hf, sq, mul_assoc, ← sq, Real.sq_sqrt
     (Complex.nonneg_iff.mp (f.map_nonneg (star_mul_self_nonneg _))).1]
   refine mul_le_mul_of_nonneg_left ?_ hf
@@ -208,13 +209,11 @@ lemma norm_apply_le (f : A →ₚ[ℂ] ℂ) (x : A) : ‖f x‖ ≤ (f 1).re * �
   convert Complex.le_def.mp this |>.1
   rw [← Complex.ofReal_pow, Complex.re_ofReal_mul, mul_comm]
 
-theorem opNorm_eq_re_map_one (f : A →ₚ[ℂ] ℂ) :
-    ‖f.toContinuousLinearMap‖ = (f 1).re := by
-  have := (Complex.re_eq_norm.mpr <| f.map_nonneg zero_le_one).symm
-  refine le_antisymm (f.toContinuousLinearMap.opNorm_le_bound
-    (by simp [← this]) f.norm_apply_le) ?_
+theorem opNorm_eq_norm_map_one (f : A →ₚ[ℂ] ℂ) :
+    ‖f.toContinuousLinearMap‖ = ‖f 1‖ := by
+  refine le_antisymm (f.toContinuousLinearMap.opNorm_le_bound (by simp) f.norm_apply_le) ?_
   by_cases! Subsingleton A
   · simp [Subsingleton.eq_zero (1 : A)]
-  simpa [this] using f.toContinuousLinearMap.le_opNorm 1
+  simpa using f.toContinuousLinearMap.le_opNorm 1
 
 end PositiveLinearMap
