@@ -299,6 +299,7 @@ lemma posDef_iff_eq_conjTranspose_mul_self [DecidableEq n] {A : Matrix n n 𝕜}
 section tracePositiveLinearMap
 variable (n α 𝕜 : Type*) [Fintype n] [Semiring α] [RCLike 𝕜] [Module α 𝕜]
 
+/-- `Matrix.trace` as a positive linear map. -/
 def tracePositiveLinearMap : Matrix n n 𝕜 →ₚ[α] 𝕜 :=
   .mk₀ (traceLinearMap n α 𝕜) fun _ h ↦ h.posSemidef.trace_nonneg
 

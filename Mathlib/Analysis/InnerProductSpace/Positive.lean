@@ -266,6 +266,7 @@ theorem IsPositive.trace_nonneg {f : E →ₗ[𝕜] E} (hf : f.IsPositive) : 0 �
 
 variable (𝕜 E) in
 open scoped ComplexOrder in
+/-- `LinearMap.trace` as a positive linear map. -/
 noncomputable def tracePositiveLinearMap : (E →ₗ[𝕜] E) →ₚ[𝕜] 𝕜 :=
   .mk₀ (LinearMap.trace 𝕜 E) fun x h ↦ sub_zero x ▸ h.trace_nonneg
 
