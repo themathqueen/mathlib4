@@ -200,6 +200,31 @@ theorem toGL_mul (A B : unitaryGroup n α) : toGL (A * B) = toGL A * toGL B := U
 def embeddingGL : unitaryGroup n α →* GeneralLinearGroup α (n → α) :=
   ⟨⟨fun A => toGL A, toGL_one⟩, toGL_mul⟩
 
+theorem _root_.Matrix.transpose_mem_unitaryGroup_iff {U : Matrix n n α} :
+    Uᵀ ∈ unitaryGroup n α ↔ U ∈ unitaryGroup n α := by
+  conv_rhs => rw [mem_unitaryGroup_iff']
+  rw [mem_unitaryGroup_iff, show star Uᵀ = (star U)ᵀ by rfl, ← transpose_mul, ← transpose_inj]
+  simp
+
+theorem _root_.Matrix.map_star_mem_unitaryGroup_iff {U : Matrix n n α} :
+    U.map star ∈ unitaryGroup n α ↔ U ∈ unitaryGroup n α := by
+  simp [← conjTranspose_transpose, transpose_mem_unitaryGroup_iff, ← star_eq_conjTranspose]
+
+/-- The transpose of a unitary matrix as a unitary matrix. -/
+def transpose (U : unitaryGroup n α) : unitaryGroup n α :=
+  ⟨Uᵀ, transpose_mem_unitaryGroup_iff.mpr (SetLike.coe_mem _)⟩
+
+lemma coe_transpose (U : unitaryGroup n α) :
+    (UnitaryGroup.transpose U : Matrix n n α) = Uᵀ := rfl
+
+/-- The `Matrix.map star` of a unitary matrix (i.e., taking the `star` of
+each element in the matrix) as a unitary matrix. -/
+def map_star (U : unitaryGroup n α) : unitaryGroup n α :=
+  ⟨(U : Matrix n n α).map star, map_star_mem_unitaryGroup_iff.mpr (SetLike.coe_mem _)⟩
+
+lemma coe_map_star (U : unitaryGroup n α) :
+    (UnitaryGroup.map_star U : Matrix n n α) = (U : Matrix n n α).map star := rfl
+
 end UnitaryGroup
 
 section specialUnitaryGroup
