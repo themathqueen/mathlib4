@@ -7,7 +7,8 @@ module
 
 public import Mathlib.Analysis.InnerProductSpace.Spectrum
 public import Mathlib.Analysis.Matrix.Hermitian
-public import Mathlib.LinearAlgebra.Matrix.PosDef
+public import Mathlib.Analysis.Matrix.Order
+public import Mathlib.LinearAlgebra.Trace
 
 /-!
 # Positive operators
@@ -185,6 +186,8 @@ lemma le_def (f g : E →ₗ[𝕜] E) : f ≤ g ↔ (g - f).IsPositive := Iff.rf
 lemma nonneg_iff_isPositive (f : E →ₗ[𝕜] E) : 0 ≤ f ↔ f.IsPositive := by
   simpa using le_def 0 f
 
+instance : IsOrderedAddMonoid (E →ₗ[𝕜] E) where add_le_add_left a b hab c := by simpa [le_def]
+
 end PartialOrder
 
 /-- An idempotent linear map is positive iff it is symmetric. -/
@@ -249,6 +252,29 @@ theorem IsSymmetricProjection.le_iff_range_le_range {p q : E →ₗ[𝕜] E}
   obtain ⟨U, _, rfl⟩ := isSymmetricProjection_iff_eq_coe_starProjection.mp hq
   simpa [Submodule.toLinearMap_starProjection_eq_isComplProjection] using
     U.mem_iff_norm_starProjection _ |>.mpr <| le_antisymm (U.norm_starProjection_apply_le a) h2
+
+open scoped ComplexOrder in
+theorem IsPositive.trace_nonneg {f : E →ₗ[𝕜] E} (hf : f.IsPositive) : 0 ≤ f.trace 𝕜 E := by
+  unfold trace
+  split_ifs with h
+  · have : FiniteDimensional 𝕜 E := Module.Finite.of_basis h.choose_spec.some
+    set b := stdOrthonormalBasis 𝕜 E
+    classical
+    simp_rw [traceAux_eq 𝕜 _ b.toBasis, traceAux, comp_apply, Matrix.traceLinearMap_apply]
+    exact Matrix.PosSemidef.trace_nonneg <| posSemidef_toMatrix_iff b |>.mpr hf
+  · simp
+
+variable (𝕜 E) in
+open scoped ComplexOrder in
+noncomputable def tracePositiveLinearMap : (E →ₗ[𝕜] E) →ₚ[𝕜] 𝕜 :=
+  .mk₀ (LinearMap.trace 𝕜 E) fun x h ↦ sub_zero x ▸ h.trace_nonneg
+
+open scoped ComplexOrder in
+@[simp] lemma toLinearMap_tracePositiveLinearMap :
+    (tracePositiveLinearMap 𝕜 E).toLinearMap = trace 𝕜 E := rfl
+
+open scoped ComplexOrder in
+@[simp] lemma tracePositiveLinearMap_apply (x) : tracePositiveLinearMap 𝕜 E x = x.trace 𝕜 E := rfl
 
 end LinearMap
 
