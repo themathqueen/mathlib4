@@ -225,6 +225,16 @@ def map_star (U : unitaryGroup n α) : unitaryGroup n α :=
 lemma coe_map_star (U : unitaryGroup n α) :
     (UnitaryGroup.map_star U : Matrix n n α) = (U : Matrix n n α).map star := rfl
 
+theorem map_star_inv_eq_transpose (U : unitaryGroup n α) :
+    (map_star U)⁻¹ = UnitaryGroup.transpose U := by
+  rw [← Subtype.val_inj, coe_transpose, inv_val, coe_map_star, star_eq_conjTranspose,
+    ← conjTranspose_map _ (by simp [Function.Semiconj]), ← conjTranspose_transpose]
+  simp
+
+theorem transpose_inv_eq_map_star (U : unitaryGroup n α) :
+    (UnitaryGroup.transpose U)⁻¹ = map_star U := by
+  simp [← map_star_inv_eq_transpose]
+
 end UnitaryGroup
 
 section specialUnitaryGroup
