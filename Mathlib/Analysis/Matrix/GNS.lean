@@ -124,4 +124,39 @@ theorem Module.Dual.monotone_and_isSelfAdjoint_toConv_iff_posSemidef_weight
     simp [he, Matrix.mul_sum]
     exact Finset.sum_nonneg fun _ _ ↦ H _
 
+theorem isHermitian_iff_star_dotProduct {n} [Fintype n]
+    {A : Matrix n n ℂ} :
+    A.IsHermitian ↔ ∀ x, star (star x ⬝ᵥ A *ᵥ x) = star x ⬝ᵥ A *ᵥ x := by
+  conv_lhs => rw [← conjTranspose_conjTranspose A, isHermitian_conjTranspose_iff]
+  classical
+  simp [isHermitian_iff_isSymmetric, LinearMap.isSymmetric_iff_inner_map_self_real,
+    EuclideanSpace.inner_eq_star_dotProduct, star_mulVec, dotProduct_comm _ (_ ᵥ* _),
+    ← dotProduct_mulVec, (WithLp.toLp_surjective _).forall]
+
+theorem posSemidef_iff_complex {n} [Fintype n] (x : Matrix n n ℂ) :
+    x.PosSemidef ↔ ∀ (y : n → ℂ), 0 ≤ star y ⬝ᵥ x.mulVec y := by
+  rw [posSemidef_iff_dotProduct_mulVec, isHermitian_iff_star_dotProduct]
+  simp_all [Complex.nonneg_iff, eq_comm (a := (0 : ℝ)), ← Complex.conj_eq_iff_im]
+
+theorem Module.Dual.monotone_iff_posSemidef_weight (f : Module.Dual ℂ (Matrix n n ℂ)) :
+    Monotone f ↔ f.weight.PosSemidef := by
+  -- rw [← monotone_and_isSelfAdjoint_toConv_iff_posSemidef_weight, iff_self_and]
+  -- intro hf
+  -- rw [isSelfAdjoint_toConv_iff_isHermitian_weight]
+  rw [posSemidef_iff_complex]
+  -- literally the same exact code as above...
+  simp_rw [fun y ↦ show star y ⬝ᵥ f.weight *ᵥ y = (f.weight * vecMulVec y (star y)).trace by
+    rw [vecMulVec_eq Unit, trace_mul_cycle', ← replicateCol_mulVec, trace_mul_comm,
+      trace_replicateCol_mul_replicateRow, dotProduct_comm]]
+  refine ⟨fun hs ↦ ?_, fun H x y ↦ ?_⟩
+  · simp only [Monotone, eq_trace_mul_weight] at hs
+    intro y
+    simpa [trace_mul_comm f.weight] using hs (posSemidef_vecMulVec_self_star y).nonneg
+  · rw [← sub_nonneg, ← sub_nonneg (b := f x), ← map_sub, eq_trace_mul_weight,
+      trace_mul_comm]
+    intro h
+    obtain ⟨m, e, he⟩ := posSemidef_iff_eq_sum_vecMulVec.mp h.posSemidef
+    simp [he, Matrix.mul_sum]
+    exact Finset.sum_nonneg fun _ _ ↦ H _
+
 end Matrix
