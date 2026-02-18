@@ -333,6 +333,7 @@ def tracePositiveLinearMap : Matrix n n 𝕜 →ₚ[α] 𝕜 :=
 
 end tracePositiveLinearMap
 
+set_option backward.isDefEq.respectTransparency false in
 set_option backward.privateInPublic true in
 /-- The pre-inner product space structure implementation. Only an auxiliary for
 `Matrix.toMatrixSeminormedAddCommGroup`, `Matrix.toMatrixNormedAddCommGroup`,
