@@ -259,10 +259,9 @@ theorem IsPositive.trace_nonneg {f : E →ₗ[𝕜] E} (hf : f.IsPositive) : 0 �
   unfold trace
   split_ifs with h
   · have : FiniteDimensional 𝕜 E := Module.Finite.of_basis h.choose_spec.some
-    set b := stdOrthonormalBasis 𝕜 E
     classical
-    simp_rw [traceAux_eq 𝕜 _ b.toBasis, traceAux, comp_apply, Matrix.traceLinearMap_apply]
-    exact Matrix.PosSemidef.trace_nonneg <| posSemidef_toMatrix_iff b |>.mpr hf
+    simp_rw [traceAux_eq 𝕜 _ (stdOrthonormalBasis 𝕜 E).toBasis]
+    exact posSemidef_toMatrix_iff (stdOrthonormalBasis 𝕜 E) |>.mpr hf |>.trace_nonneg
   · simp
 
 variable (𝕜 E) in
